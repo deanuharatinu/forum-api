@@ -33,7 +33,10 @@ describe('AddNewThreadUseCase', () => {
       .mockImplementation(() => Promise.resolve('user-123'));
 
     /** creating use case instance */
-    const addNewThreadUseCase = new AddNewThreadUseCase(mockThreadRepository, mockUserRepository);
+    const addNewThreadUseCase = new AddNewThreadUseCase({
+      threadRepository: mockThreadRepository,
+      userRepository: mockUserRepository,
+    });
 
     // Action
     const thread = await addNewThreadUseCase.execute(useCasePayload, 'user-123');
@@ -61,7 +64,10 @@ describe('AddNewThreadUseCase', () => {
       .mockImplementation(() => { throw new Error(); });
 
     /** creating use case instance */
-    const addNewThreadUseCase = new AddNewThreadUseCase({}, mockUserRepository);
+    const addNewThreadUseCase = new AddNewThreadUseCase({
+      threadRepository: {},
+      userRepository: mockUserRepository,
+    });
 
     // Action and Assert
     await expect(addNewThreadUseCase.execute(useCasePayload, 'user-123'))
