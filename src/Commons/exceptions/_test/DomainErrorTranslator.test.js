@@ -13,7 +13,7 @@ describe('DomainErrorTranslator', () => {
       .toStrictEqual(new InvariantError('tidak dapat membuat user baru karena username mengandung karakter terlarang'));
   });
 
-  it('should translet NewThread error correctly', () => {
+  it('should translate NewThread error correctly', () => {
     expect(DomainErrorTranslator.translate(new Error('NEW_THREAD.NOT_CONTAIN_NEEDED_PROPERTY')))
       .toStrictEqual(new InvariantError('tidak dapat menambahkan thread karena properti yang dibutuhkan tidak sesuai'));
     expect(DomainErrorTranslator.translate(new Error('NEW_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION')))
