@@ -1,8 +1,11 @@
 const AddCommentUseCase = require('../AddCommentUseCase');
 
 describe('AddCommentUseCase', () => {
-  beforeEach(() => {
+  let mockCommentRepository;
+  let mockUserRepository;
 
+  beforeEach(() => {
+    // mockCommentRepository = new 
   });
 
   it('should orchestrating the add comment action correctly', () => {
@@ -15,6 +18,7 @@ describe('AddCommentUseCase', () => {
 
   it('should throw error when user is not registered', () => {
     // Arrange
+
 
     // Action
 
