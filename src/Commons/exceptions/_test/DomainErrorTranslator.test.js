@@ -1,5 +1,6 @@
 const DomainErrorTranslator = require('../DomainErrorTranslator');
 const InvariantError = require('../InvariantError');
+const AuthenticationError = require('../AuthenticationError');
 
 describe('DomainErrorTranslator', () => {
   it('should translate error correctly', () => {
@@ -18,6 +19,18 @@ describe('DomainErrorTranslator', () => {
       .toStrictEqual(new InvariantError('tidak dapat menambahkan thread karena properti yang dibutuhkan tidak sesuai'));
     expect(DomainErrorTranslator.translate(new Error('NEW_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION')))
       .toStrictEqual(new InvariantError('title dan body harus string'));
+  });
+
+  it('should translate AddNewThread error correctly', () => {
+    expect(DomainErrorTranslator.translate(new Error('ADD_NEW_THREAD_USE_CASE.USER_NOT_ALLOWED')))
+      .toStrictEqual(new AuthenticationError('user tidak dikenal'));
+  });
+
+  it('should translate AddComment error correctly', () => {
+    expect(DomainErrorTranslator.translate(new Error('ADD_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY')))
+      .toStrictEqual(new InvariantError('content tidak boleh kosong'));
+    expect(DomainErrorTranslator.translate(new Error('ADD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION')))
+      .toStrictEqual(new InvariantError('content harus string'));
   });
 
   it('should return original error when error message is not needed to translate', () => {

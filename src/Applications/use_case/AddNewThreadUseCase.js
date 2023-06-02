@@ -17,7 +17,6 @@ class AddNewThreadUseCase {
     try {
       await this._userRepository.verifyUserById(ownerId);
     } catch (error) {
-      // TODO ini harus ditranslate errornya
       throw new Error('ADD_NEW_THREAD_USE_CASE.USER_NOT_ALLOWED');
     }
   }

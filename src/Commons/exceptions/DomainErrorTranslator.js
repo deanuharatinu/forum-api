@@ -1,4 +1,5 @@
 /* eslint-disable no-underscore-dangle */
+const AuthenticationError = require('./AuthenticationError');
 const InvariantError = require('./InvariantError');
 
 const DomainErrorTranslator = {
@@ -24,6 +25,11 @@ DomainErrorTranslator._directories = {
 
   'NEW_THREAD.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('tidak dapat menambahkan thread karena properti yang dibutuhkan tidak sesuai'),
   'NEW_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('title dan body harus string'),
+
+  'ADD_NEW_THREAD_USE_CASE.USER_NOT_ALLOWED': new AuthenticationError('user tidak dikenal'),
+
+  'ADD_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('content tidak boleh kosong'),
+  'ADD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('content harus string'),
 };
 
 module.exports = DomainErrorTranslator;
