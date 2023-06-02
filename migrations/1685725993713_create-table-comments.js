@@ -13,6 +13,10 @@ exports.up = (pgm) => {
       type: 'BOOLEAN',
       default: false,
     },
+    date: {
+      type: 'TEXT',
+      notNull: true,
+    },
     owner: {
       type: 'VARCHAR(50)',
       notNull: true,
