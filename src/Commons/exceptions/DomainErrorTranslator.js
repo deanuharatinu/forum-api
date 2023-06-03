@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 const AuthenticationError = require('./AuthenticationError');
 const InvariantError = require('./InvariantError');
+const NotFoundError = require('./NotFoundError');
 
 const DomainErrorTranslator = {
   translate(error) {
@@ -30,6 +31,8 @@ DomainErrorTranslator._directories = {
 
   'ADD_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('content tidak boleh kosong'),
   'ADD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('content harus string'),
+
+  'ADD_COMMENT_USE_CASE.THREAD_NOT_FOUND': new NotFoundError('thread tidak ditemukan'),
 };
 
 module.exports = DomainErrorTranslator;

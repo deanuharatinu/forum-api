@@ -12,7 +12,6 @@ class AddCommentUseCase {
   async execute(useCasePayload, ownerId, threadId) {
     const addComment = new AddComment(useCasePayload);
     await this._verifyUser(ownerId);
-    // TODO verifyThread belum ada real implementationnya
     await this._verifyThread(threadId);
     const comment = await this._commentRepository.addComment(addComment);
     return comment;
@@ -30,7 +29,6 @@ class AddCommentUseCase {
     try {
       await this._threadRepository.verifyThreadById(threadId);
     } catch (error) {
-      // TODO harus dibikin domain translator
       throw new Error('ADD_COMMENT_USE_CASE.THREAD_NOT_FOUND');
     }
   }

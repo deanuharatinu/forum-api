@@ -1,6 +1,7 @@
 const DomainErrorTranslator = require('../DomainErrorTranslator');
 const InvariantError = require('../InvariantError');
 const AuthenticationError = require('../AuthenticationError');
+const NotFoundError = require('../NotFoundError');
 
 describe('DomainErrorTranslator', () => {
   it('should translate error correctly', () => {
@@ -31,6 +32,11 @@ describe('DomainErrorTranslator', () => {
       .toStrictEqual(new InvariantError('content tidak boleh kosong'));
     expect(DomainErrorTranslator.translate(new Error('ADD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION')))
       .toStrictEqual(new InvariantError('content harus string'));
+  });
+
+  it('should translate AddCommentUseCase error correctly', () => {
+    expect(DomainErrorTranslator.translate(new Error('ADD_COMMENT_USE_CASE.THREAD_NOT_FOUND')))
+      .toStrictEqual(new NotFoundError('thread tidak ditemukan'));
   });
 
   it('should return original error when error message is not needed to translate', () => {
