@@ -35,4 +35,31 @@ describe('ThreadRepository postgres', () => {
       }));
     });
   });
+
+  describe('verifyThreadById function', () => {
+    it('should throw error when thread is not found', async () => {
+      // Arrange
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+
+      // Action and Assert
+      await expect(threadRepositoryPostgres.verifyThreadById(''))
+        .rejects
+        .toThrowError('thread tidak ditemukan');
+    });
+
+    it('should return threadId correctly', async () => {
+      // Arrange
+      const newThread = new NewThread({ title: 'a title', body: 'a body' });
+      const expectedOwner = 'user-123';
+      await UsersTableTestHelper.addUser({ id: expectedOwner });
+      const fakeIdGenerator = () => '123';
+
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
+      const thread = await threadRepositoryPostgres.addNewThread(newThread, expectedOwner);
+
+      // Action
+      const threadId = await threadRepositoryPostgres.verifyThreadById(thread.id);
+      expect(threadId).toEqual(thread.id);
+    });
+  });
 });
