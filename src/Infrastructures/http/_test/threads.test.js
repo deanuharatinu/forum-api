@@ -61,57 +61,190 @@ describe('/threads endpoint', () => {
       expect(response.statusCode).toEqual(401);
       expect(responseJson.message).toEqual('Missing authentication');
     });
-  });
 
-  it('should response 400 when given invalid body', async () => {
-    // Arrange
-    const requestPayload = {
-      title: 123,
-      body: 'A Body',
-    };
+    it('should response 400 when given invalid body', async () => {
+      // Arrange
+      const requestPayload = {
+        title: 123,
+        body: 'A Body',
+      };
 
-    // Action
-    const response = await server.inject({
-      method: 'POST',
-      url: '/threads',
-      headers: { Authorization: `Bearer ${accessToken}` },
-      payload: requestPayload,
+      // Action
+      const response = await server.inject({
+        method: 'POST',
+        url: '/threads',
+        headers: { Authorization: `Bearer ${accessToken}` },
+        payload: requestPayload,
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(400);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('title dan body harus string');
     });
 
-    // Assert
-    const responseJson = JSON.parse(response.payload);
-    expect(response.statusCode).toEqual(400);
-    expect(responseJson.status).toEqual('fail');
-    expect(responseJson.message).toEqual('title dan body harus string');
+    it('should response 201 with a valid payload', async () => {
+      // Arrange
+      const requestPayload = {
+        title: 'This is a title',
+        body: 'This is a body',
+      };
+
+      // Action
+      const response = await server.inject({
+        method: 'POST',
+        url: '/threads',
+        headers: { Authorization: `Bearer ${accessToken}` },
+        payload: requestPayload,
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(201);
+      expect(responseJson.status).toEqual('success');
+      expect(responseJson).toHaveProperty('data');
+      expect(responseJson.data).toHaveProperty('addedThread');
+      expect(responseJson.data.addedThread).toBeInstanceOf(Object);
+      expect(responseJson.data.addedThread).toHaveProperty('id');
+      expect(responseJson.data.addedThread.id).not.toBeUndefined();
+      expect(responseJson.data.addedThread).toHaveProperty('title');
+      expect(responseJson.data.addedThread.title).not.toBeUndefined();
+      expect(responseJson.data.addedThread).toHaveProperty('owner');
+      expect(responseJson.data.addedThread.owner).not.toBeUndefined();
+    });
   });
 
-  it('should response 201 with a valid payload', async () => {
-    // Arrange
-    const requestPayload = {
-      title: 'This is a title',
-      body: 'This is a body',
-    };
+  describe('when POST /threads/{threadsId}/comments', () => {
+    it('should response 401 when missing authentication ', async () => {
+      // Action
+      const response = await server.inject({
+        method: 'POST',
+        url: '/threads/thread-123/comments',
+      });
 
-    // Action
-    const response = await server.inject({
-      method: 'POST',
-      url: '/threads',
-      headers: { Authorization: `Bearer ${accessToken}` },
-      payload: requestPayload,
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(401);
+      expect(responseJson.message).toEqual('Missing authentication');
     });
 
-    // Assert
-    const responseJson = JSON.parse(response.payload);
-    expect(response.statusCode).toEqual(201);
-    expect(responseJson.status).toEqual('success');
-    expect(responseJson).toHaveProperty('data');
-    expect(responseJson.data).toHaveProperty('addedThread');
-    expect(responseJson.data.addedThread).toBeInstanceOf(Object);
-    expect(responseJson.data.addedThread).toHaveProperty('id');
-    expect(responseJson.data.addedThread.id).not.toBeUndefined();
-    expect(responseJson.data.addedThread).toHaveProperty('title');
-    expect(responseJson.data.addedThread.title).not.toBeUndefined();
-    expect(responseJson.data.addedThread).toHaveProperty('owner');
-    expect(responseJson.data.addedThread.owner).not.toBeUndefined();
+    it('should response 400 when given invalid body', async () => {
+      // Arrange
+      const requestPayload = {
+        content: 123,
+      };
+
+      /** add thread */
+      const threadPayload = {
+        title: 'This is a title',
+        body: 'This is a body',
+      };
+
+      const threadResponse = await server.inject({
+        method: 'POST',
+        url: '/threads',
+        headers: { Authorization: `Bearer ${accessToken}` },
+        payload: threadPayload,
+      });
+
+      const threadJson = JSON.parse(threadResponse.payload);
+      const threadId = threadJson.data.addedThread.id;
+
+      // Action
+      const response = await server.inject({
+        method: 'POST',
+        url: `/threads/${threadId}/comments`,
+        headers: { Authorization: `Bearer ${accessToken}` },
+        payload: requestPayload,
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(400);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('content harus string');
+    });
+
+    it('should response 404 when the thread is not found', async () => {
+      // Arrange
+      const requestPayload = {
+        content: 123,
+      };
+
+      /** add thread */
+      const threadPayload = {
+        title: 'This is a title',
+        body: 'This is a body',
+      };
+
+      const threadResponse = await server.inject({
+        method: 'POST',
+        url: '/threads',
+        headers: { Authorization: `Bearer ${accessToken}` },
+        payload: threadPayload,
+      });
+
+      const threadJson = JSON.parse(threadResponse.payload);
+      const threadId = threadJson.data.addedThread.id;
+
+      // Action
+      const response = await server.inject({
+        method: 'POST',
+        url: `/threads/${threadId}/comments`,
+        headers: { Authorization: `Bearer ${accessToken}` },
+        payload: requestPayload,
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(400);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('content harus string');
+    });
+
+    it('should response 201 with a valid payload', async () => {
+      // Arrange
+      const requestPayload = {
+        content: 'this is a content',
+      };
+
+      /** add thread */
+      const threadPayload = {
+        title: 'This is a title',
+        body: 'This is a body',
+      };
+
+      const threadResponse = await server.inject({
+        method: 'POST',
+        url: '/threads',
+        headers: { Authorization: `Bearer ${accessToken}` },
+        payload: threadPayload,
+      });
+      const threadJson = JSON.parse(threadResponse.payload);
+      const threadId = threadJson.data.addedThread.id;
+
+      // Action
+      const response = await server.inject({
+        method: 'POST',
+        url: `/threads/${threadId}/comments`,
+        headers: { Authorization: `Bearer ${accessToken}` },
+        payload: requestPayload,
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(201);
+      expect(responseJson.status).toEqual('success');
+      expect(responseJson).toHaveProperty('data');
+      expect(responseJson.data).toHaveProperty('addedComment');
+      expect(responseJson.data.addedComment).toBeInstanceOf(Object);
+      expect(responseJson.data.addedComment).toHaveProperty('id');
+      expect(responseJson.data.addedComment.id).not.toBeUndefined();
+      expect(responseJson.data.addedComment).toHaveProperty('content');
+      expect(responseJson.data.addedComment.content).not.toBeUndefined();
+      expect(responseJson.data.addedComment).toHaveProperty('owner');
+      expect(responseJson.data.addedComment.owner).not.toBeUndefined();
+    });
   });
 });

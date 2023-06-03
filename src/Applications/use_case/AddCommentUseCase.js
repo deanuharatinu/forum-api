@@ -13,7 +13,7 @@ class AddCommentUseCase {
     const addComment = new AddComment(useCasePayload);
     await this._verifyUser(ownerId);
     await this._verifyThread(threadId);
-    const comment = await this._commentRepository.addComment(addComment);
+    const comment = await this._commentRepository.addComment(addComment, threadId, ownerId);
     return comment;
   }
 
