@@ -2,6 +2,7 @@
 const AuthenticationError = require('./AuthenticationError');
 const InvariantError = require('./InvariantError');
 const NotFoundError = require('./NotFoundError');
+const AuthorizationError = require('./AuthorizationError');
 
 const DomainErrorTranslator = {
   translate(error) {
@@ -33,6 +34,11 @@ DomainErrorTranslator._directories = {
   'ADD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('content harus string'),
 
   'ADD_COMMENT_USE_CASE.THREAD_NOT_FOUND': new NotFoundError('thread tidak ditemukan'),
+
+  'DELETE_COMMENT_USE_CASE.THREAD_NOT_FOUND': new NotFoundError('thread tidak ditemukan'),
+  'DELETE_COMMENT_USE_CASE.USER_NOT_ALLOWED': new AuthorizationError('user tidak memiliki akses'),
+  'DELETE_COMMENT_USE_CASE.USER_NOT_AUTHENTICATED': new AuthenticationError('user tidak terautentikasi'),
+  'DELETE_COMMENT_USE_CASE.COMMENT_NOT_FOUND': new NotFoundError('komentar tidak ditemukan'),
 };
 
 module.exports = DomainErrorTranslator;
