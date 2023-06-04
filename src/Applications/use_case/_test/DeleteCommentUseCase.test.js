@@ -71,4 +71,26 @@ describe('DeleteCommentUseCase', () => {
       .rejects
       .toThrowError();
   });
+
+  it('should not throw error when comment is found and deleted', async () => {
+    // Arrange
+    const mockCommentRepository = new CommentRepository();
+
+    /** mocking */
+    mockCommentRepository.findCommentById = jest.fn()
+      .mockImplementation(() => Promise.resolve(new Comment({
+        id: 'comment-1234', content: 'a content', owner: 'user-1234',
+      })));
+    mockCommentRepository.deleteCommentById = jest.fn()
+      .mockImplementation(() => Promise.resolve());
+
+    /** create use case */
+    const deleteCommentUseCase = new DeleteCommentUseCase({
+      commentRepository: mockCommentRepository,
+    });
+
+    // Action and Assert
+    await expect(deleteCommentUseCase.execute('comment-1234', 'user-1234'))
+      .resolves.not.toThrowError();
+  });
 });
