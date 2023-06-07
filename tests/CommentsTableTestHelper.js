@@ -5,8 +5,7 @@ const CommentsTableTestHelper = {
     await pool.query('DELETE FROM comments WHERE 1=1');
   },
 
-  async addComment({ content }, threadId, ownerId) {
-    const id = 'comment-123456';
+  async addComment({ content }, threadId, ownerId, id = 'comment-123456') {
     const date = new Date().toISOString();
 
     const query = {

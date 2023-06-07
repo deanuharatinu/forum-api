@@ -1,5 +1,6 @@
 const CommentRepository = require('../../Domains/comments/CommentRepository');
 const Comment = require('../../Domains/comments/entities/Comment');
+const CommentDetail = require('../../Domains/comments/entities/CommentDetail');
 
 class CommentRepositoryPostgres extends CommentRepository {
   constructor(pool, idGenerator) {
@@ -53,6 +54,26 @@ class CommentRepositoryPostgres extends CommentRepository {
     }
 
     return new Comment(result.rows[0]);
+  }
+
+  async getCommenstByThreadId(threadId) {
+    // id, username, date, content, is_deleted: isDeleted,
+    const query = {
+      text: `SELECT c.id, u.username, c.date, c.content, c.is_deleted 
+            FROM comments AS c 
+            LEFT JOIN users AS u 
+            ON c.owner = u.id 
+            WHERE c.thread_id = $1`,
+      values: [threadId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new Error('comment tidak ditemukan');
+    }
+
+    return result.rows.map((payload) => new CommentDetail(payload));
   }
 }
 
