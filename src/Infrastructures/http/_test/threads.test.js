@@ -115,7 +115,7 @@ describe('/threads endpoint', () => {
     });
   });
 
-  describe('when POST /threads/{threadsId}/comments', () => {
+  describe('when POST /threads/{threadId}/comments', () => {
     it('should response 401 when missing authentication ', async () => {
       // Action
       const response = await server.inject({
@@ -248,7 +248,7 @@ describe('/threads endpoint', () => {
     });
   });
 
-  describe('when DELETE /threads/{threadsId}/comments', () => {
+  describe('when DELETE /threads/{threadId}/comments', () => {
     it('should response 401 when missing authentication', async () => {
       // Action
       const response = await server.inject({
@@ -359,7 +359,7 @@ describe('/threads endpoint', () => {
       expect(responseJson.message).toEqual('komentar tidak ditemukan');
     });
 
-    it('should response 403 when thread is not found', async () => {
+    it('should response 404 when thread is not found', async () => {
       // Arrange
       // Action
       const response = await server.inject({
@@ -420,5 +420,104 @@ describe('/threads endpoint', () => {
       expect(responseJson).toHaveProperty('status');
       expect(responseJson.status).toEqual('success');
     });
+  });
+
+  describe('when GET /threads/{threadId', () => {
+    it('should response 404 when thread is not found', async () => {
+      // Arrange and Action
+      const response = await server.inject({
+        method: 'GET',
+        url: '/threads/thread-not-found-123',
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJson).toHaveProperty('status');
+      expect(responseJson.status).toEqual('fail');
+    });
+
+    it('should response 200 when thread is found, but with empty comment', async () => {
+      // Arrange
+      /** add thread */
+      const threadPayload = {
+        title: 'This is a title',
+        body: 'This is a body',
+      };
+
+      const threadResponse = await server.inject({
+        method: 'POST',
+        url: '/threads',
+        headers: { Authorization: `Bearer ${accessToken}` },
+        payload: threadPayload,
+      });
+      const threadJson = JSON.parse(threadResponse.payload);
+      const threadId = threadJson.data.addedThread.id;
+
+      // Action
+      const response = await server.inject({
+        method: 'GET',
+        url: `/threads/${threadId}`,
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJson.data.thread.id).toEqual(threadId);
+      expect(responseJson.data.thread.title).toEqual(threadPayload.title);
+      expect(responseJson.data.thread.body).toEqual(threadPayload.body);
+      expect(responseJson.data.thread.username).toEqual('dicoding');
+      expect(responseJson.data.thread.comments.length).toEqual(0);
+    });
+  });
+
+  it('should response 200 when thread is found with the comments', async () => {
+    // Arrange
+    /** add thread */
+    const threadPayload = {
+      title: 'This is a title',
+      body: 'This is a body',
+    };
+
+    const threadResponse = await server.inject({
+      method: 'POST',
+      url: '/threads',
+      headers: { Authorization: `Bearer ${accessToken}` },
+      payload: threadPayload,
+    });
+    const threadJson = JSON.parse(threadResponse.payload);
+    const threadId = threadJson.data.addedThread.id;
+
+    /** add comment */
+    const commentPayload = {
+      content: 'a comment',
+    };
+
+    await server.inject({
+      method: 'POST',
+      url: `/threads/${threadId}/comments`,
+      headers: { Authorization: `Bearer ${accessToken}` },
+      payload: commentPayload,
+    });
+
+    // Action
+    const response = await server.inject({
+      method: 'GET',
+      url: `/threads/${threadId}`,
+    });
+
+    // Assert
+    const responseJson = JSON.parse(response.payload);
+    expect(response.statusCode).toEqual(200);
+    expect(responseJson.data.thread.id).toEqual(threadId);
+    expect(responseJson.data.thread.title).toEqual(threadPayload.title);
+    expect(responseJson.data.thread.body).toEqual(threadPayload.body);
+    expect(responseJson.data.thread.username).toEqual('dicoding');
+    expect(responseJson.data.thread.comments.length).toEqual(1);
+
+    const comment = responseJson.data.thread.comments[0];
+    expect(comment.username).toEqual('dicoding');
+    expect(comment.content).toEqual(commentPayload.content);
   });
 });
