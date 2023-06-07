@@ -348,7 +348,7 @@ describe('/threads endpoint', () => {
       // Action
       const response = await server.inject({
         method: 'DELETE',
-        url: `/threads/${threadId}/comments/comment-not-found-123}`,
+        url: `/threads/${threadId}/comments/comment-not-found-123`,
         headers: { Authorization: `Bearer ${accessToken}` },
       });
 
@@ -364,7 +364,7 @@ describe('/threads endpoint', () => {
       // Action
       const response = await server.inject({
         method: 'DELETE',
-        url: '/threads/thread-not-found-123/comments/comment-not-found-123}',
+        url: '/threads/thread-not-found-123/comments/comment-not-found-123',
         headers: { Authorization: `Bearer ${accessToken}` },
       });
 
@@ -376,7 +376,49 @@ describe('/threads endpoint', () => {
     });
 
     it('should response 200 when delete comment is success', async () => {
+      // Arrange
+      /** add thread */
+      const threadPayload = {
+        title: 'This is a title',
+        body: 'This is a body',
+      };
 
+      const threadResponse = await server.inject({
+        method: 'POST',
+        url: '/threads',
+        headers: { Authorization: `Bearer ${accessToken}` },
+        payload: threadPayload,
+      });
+      const threadJson = JSON.parse(threadResponse.payload);
+      const threadId = threadJson.data.addedThread.id;
+
+      /** add comment */
+      const commentPayload = {
+        content: 'a comment',
+      };
+
+      const commentResponse = await server.inject({
+        method: 'POST',
+        url: `/threads/${threadId}/comments`,
+        headers: { Authorization: `Bearer ${accessToken}` },
+        payload: commentPayload,
+      });
+
+      const commentJson = JSON.parse(commentResponse.payload);
+      const commentId = commentJson.data.addedComment.id;
+
+      // Action
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${threadId}/comments/${commentId}`,
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJson).toHaveProperty('status');
+      expect(responseJson.status).toEqual('success');
     });
   });
 });
