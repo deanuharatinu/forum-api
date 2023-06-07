@@ -165,5 +165,38 @@ describe('CommentRepository postgres', () => {
       expect(commentResult2.id).toEqual(comment2Thread1.id);
       expect(commentResult2.username).toEqual('test comment username');
     });
+
+    it('should return a list of correct order ofCommentDetail objects', async () => {
+      // Arrange
+      /** add user */
+      await UsersTableTestHelper.addUser({ id: 'user-123', username: 'test comment username' });
+
+      /** add thread */
+      const threadId = await ThreadsTableTestHelper.addNewThread({ id: 'thread1-123', owner: 'user-123' });
+
+      /** add 3 comment on first thread */
+      const comment1 = await CommentsTableTestHelper.addComment({ content: 'a content 1 on thread 1' }, threadId, 'user-123', 'com-1');
+      const comment2 = await CommentsTableTestHelper.addComment({ content: 'a content 2 on thread 2' }, threadId, 'user-123', 'com-2');
+      const comment3 = await CommentsTableTestHelper.addComment({ content: 'a content 2 on thread 2' }, threadId, 'user-123', 'com-3');
+
+      const fakeIdGenerator = () => '123';
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
+
+      // Action
+      /** find comments by threadId1 */
+      const commentsDetail = await commentRepositoryPostgres.getCommenstByThreadId(threadId);
+
+      // Assert
+      expect(commentsDetail.length).toEqual(3);
+      /** first comment */
+      const commentResult1 = commentsDetail[0];
+      expect(commentResult1.id).toEqual(comment1.id);
+      /** second comment */
+      const commentResult2 = commentsDetail[1];
+      expect(commentResult2.id).toEqual(comment2.id);
+      /** third comment */
+      const commentResult3 = commentsDetail[2];
+      expect(commentResult3.id).toEqual(comment3.id);
+    });
   });
 });
