@@ -62,4 +62,33 @@ describe('ThreadRepository postgres', () => {
       expect(threadId).toEqual(thread.id);
     });
   });
+
+  describe('getThreadDetailByThreadId function', () => {
+    it('should throw error when thread is not found', async () => {
+      // Arrange
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+
+      // Action and Assert
+      await expect(threadRepositoryPostgres.verifyThreadById(''))
+        .rejects
+        .toThrowError('thread tidak ditemukan');
+    });
+
+    it('should return ThreadWithoutComments object correctly', async () => {
+      // Arrange
+      const newThread = new NewThread({ title: 'a title', body: 'a body' });
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+
+      const fakeIdGenerator = () => '123';
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
+      const thread = await threadRepositoryPostgres.addNewThread(newThread, 'user-123');
+
+      // Action
+      const threadDetailWithoutComments = await threadRepositoryPostgres
+        .getThreadDetailByThreadId(thread.id);
+      expect(threadDetailWithoutComments.id).toEqual(thread.id);
+      expect(threadDetailWithoutComments.title).toEqual(newThread.title);
+      expect(threadDetailWithoutComments.body).toEqual(newThread.body);
+    });
+  });
 });

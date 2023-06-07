@@ -1,5 +1,6 @@
 const ThreadRepository = require('../../Domains/threads/ThreadRepository');
 const Thread = require('../../Domains/threads/entities/Thread');
+const ThreadWithoutComments = require('../../Domains/threads/entities/ThreadDetailWithoutComments');
 
 class ThreadRepositoryPostgres extends ThreadRepository {
   constructor(pool, idGenerator) {
@@ -35,6 +36,24 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     }
 
     return result.rows[0].id;
+  }
+
+  async getThreadDetailByThreadId(threadId) {
+    const query = {
+      text: `SELECT t.id, t.title, t.body, t.date, u.username FROM threads AS t 
+            LEFT JOIN users AS u 
+            ON t.owner = u.id 
+            WHERE t.id = $1`,
+      values: [threadId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new Error('thread tidak ditemukan');
+    }
+
+    return new ThreadWithoutComments(result.rows[0]);
   }
 }
 
