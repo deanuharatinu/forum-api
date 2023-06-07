@@ -39,6 +39,8 @@ DomainErrorTranslator._directories = {
   'DELETE_COMMENT_USE_CASE.USER_NOT_ALLOWED': new AuthorizationError('user tidak memiliki akses'),
   'DELETE_COMMENT_USE_CASE.USER_NOT_AUTHENTICATED': new AuthenticationError('user tidak terautentikasi'),
   'DELETE_COMMENT_USE_CASE.COMMENT_NOT_FOUND': new NotFoundError('komentar tidak ditemukan'),
+
+  'GET_THREAD_DETAIL_USE_CASE.THREAD_NOT_FOUND': new NotFoundError('thread tidak ditemukan'),
 };
 
 module.exports = DomainErrorTranslator;

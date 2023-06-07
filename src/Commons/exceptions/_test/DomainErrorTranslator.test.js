@@ -51,6 +51,11 @@ describe('DomainErrorTranslator', () => {
       .toStrictEqual(new NotFoundError('komentar tidak ditemukan'));
   });
 
+  it('should translate GetThreadDetailUseCase error correctly', () => {
+    expect(DomainErrorTranslator.translate(new NotFoundError('GET_THREAD_DETAIL_USE_CASE.THREAD_NOT_FOUND')))
+      .toStrictEqual(new NotFoundError('thread tidak ditemukan'));
+  });
+
   it('should return original error when error message is not needed to translate', () => {
     // Arrange
     const error = new Error('some_error_message');
