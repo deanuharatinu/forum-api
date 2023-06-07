@@ -3,7 +3,6 @@ class CommentDetail {
   constructor(payload) {
     this._verifyPayload(payload);
 
-    // username (is an id) referenced to table users for getting the name
     const {
       id, username, date, content, is_deleted: isDeleted,
     } = payload;
