@@ -1,12 +1,12 @@
-const CommentDetail = require('../CommentDetail');
+const CommentDetailWithReplies = require('../CommentDetailWithReplies');
 
-describe('a CommentDetail entities', () => {
+describe('a CommentDetailWithReplies entities', () => {
   it('should throw error when paylod did not contain needed property', () => {
     // Arrange
     const payload = {};
 
     // Action and Assert
-    expect(() => new CommentDetail(payload)).toThrowError('COMMENT_DETAIL.NOT_CONTAIN_NEEDED_PROPERTY');
+    expect(() => new CommentDetailWithReplies(payload)).toThrowError('COMMENT_DETAIL.NOT_CONTAIN_NEEDED_PROPERTY');
   });
 
   it('should throw error when payload did not meet data type specs', () => {
@@ -19,7 +19,7 @@ describe('a CommentDetail entities', () => {
     };
 
     // Action and Assert
-    expect(() => new CommentDetail(payload)).toThrowError('COMMENT_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
+    expect(() => new CommentDetailWithReplies(payload)).toThrowError('COMMENT_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
 
   it('should create object correctly', () => {
@@ -32,7 +32,7 @@ describe('a CommentDetail entities', () => {
     };
 
     // Action
-    const commentDetail = new CommentDetail(payload);
+    const commentDetail = new CommentDetailWithReplies(payload);
 
     // Assert
     expect(commentDetail.id).toEqual(payload.id);
@@ -52,7 +52,7 @@ describe('a CommentDetail entities', () => {
     };
 
     // Action
-    const commentDetail = new CommentDetail(payload);
+    const commentDetail = new CommentDetailWithReplies(payload);
 
     // Assert
     expect(commentDetail.id).toEqual(payload.id);
@@ -72,7 +72,7 @@ describe('a CommentDetail entities', () => {
     };
 
     // Action
-    const commentDetail = new CommentDetail(payload);
+    const commentDetail = new CommentDetailWithReplies(payload);
 
     // Assert
     expect(commentDetail.id).toEqual(payload.id);

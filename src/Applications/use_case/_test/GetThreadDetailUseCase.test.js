@@ -2,7 +2,7 @@ const GetThreadDetailUseCase = require('../GetThreadDetailUseCase');
 const CommentRepository = require('../../../Domains/comments/CommentRepository');
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const ThreadDetailWithoutComments = require('../../../Domains/threads/entities/ThreadDetailWithoutComments');
-const CommentDetail = require('../../../Domains/comments/entities/CommentDetail');
+const CommentDetail = require('../../../Domains/comments/entities/CommentDetailWithReplies');
 
 describe('GetThreadDetailUseCase', () => {
   it('should throw error when thread is not found', async () => {

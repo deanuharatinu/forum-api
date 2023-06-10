@@ -56,6 +56,20 @@ describe('DomainErrorTranslator', () => {
       .toStrictEqual(new NotFoundError('thread tidak ditemukan'));
   });
 
+  it('should translate AddReplylUseCase error correctly', () => {
+    expect(DomainErrorTranslator.translate(new Error('ADD_REPLY_USE_CASE.THREAD_NOT_FOUND')))
+      .toStrictEqual(new NotFoundError('thread tidak ditemukan'));
+    expect(DomainErrorTranslator.translate(new Error('ADD_REPLY_USE_CASE.COMMENT_NOT_FOUND')))
+      .toStrictEqual(new NotFoundError('komentar tidak ditemukan'));
+  });
+
+  it('should translate AddReply error correctly', () => {
+    expect(DomainErrorTranslator.translate(new Error('ADD_REPLY.NOT_CONTAIN_NEEDED_PROPERTY')))
+      .toStrictEqual(new InvariantError('content tidak boleh kosong'));
+    expect(DomainErrorTranslator.translate(new Error('ADD_REPLY.NOT_MEET_DATA_TYPE_SPECIFICATION')))
+      .toStrictEqual(new InvariantError('content harus string'));
+  });
+
   it('should return original error when error message is not needed to translate', () => {
     // Arrange
     const error = new Error('some_error_message');

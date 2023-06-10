@@ -4,11 +4,11 @@ class ReplyDetail {
     this._verifyPayload(payload);
 
     const {
-      id, content, date, username,
+      id, content, date, username, is_deleted: isDeleted,
     } = payload;
 
     this.id = id;
-    this.content = content;
+    this.content = this._setDeletedComment(content, isDeleted);
     this.date = date;
     this.username = username;
   }
@@ -23,6 +23,14 @@ class ReplyDetail {
     if (typeof id !== 'string' || typeof content !== 'string' || typeof date !== 'string' || typeof username !== 'string') {
       throw new Error('REPLY_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
+  }
+
+  _setDeletedComment(content, isDeleted) {
+    if (isDeleted) {
+      return '**balasan telah dihapus**';
+    }
+
+    return content;
   }
 }
 

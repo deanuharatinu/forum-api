@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable class-methods-use-this */
-class RepliesRepository {
-  async addReply(addReply, ownerId) {
+class ReplyRepository {
+  async addReply(addReply, commentId, ownerId) {
     throw new Error('REPLIES_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
 
@@ -18,4 +18,4 @@ class RepliesRepository {
   }
 }
 
-module.exports = RepliesRepository;
+module.exports = ReplyRepository;

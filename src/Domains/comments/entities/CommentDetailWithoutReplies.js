@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-class CommentDetail {
+class CommentDetailWithoutReplies {
   constructor(payload) {
     this._verifyPayload(payload);
 
@@ -17,11 +17,11 @@ class CommentDetail {
     id, username, date, content,
   }) {
     if (!id || !username || !date || !content) {
-      throw new Error('COMMENT_DETAIL.NOT_CONTAIN_NEEDED_PROPERTY');
+      throw new Error('COMMENT_DETAIL_WITHOUT_REPLIES.NOT_CONTAIN_NEEDED_PROPERTY');
     }
 
     if (typeof id !== 'string' || typeof username !== 'string' || typeof date !== 'string' || typeof content !== 'string') {
-      throw new Error('COMMENT_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
+      throw new Error('COMMENT_DETAIL_WITHOUT_REPLIES.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
   }
 
@@ -34,4 +34,4 @@ class CommentDetail {
   }
 }
 
-module.exports = CommentDetail;
+module.exports = CommentDetailWithoutReplies;
