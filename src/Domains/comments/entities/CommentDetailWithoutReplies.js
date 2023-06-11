@@ -4,13 +4,14 @@ class CommentDetailWithoutReplies {
     this._verifyPayload(payload);
 
     const {
-      id, username, date, content, is_deleted: isDeleted,
+      id, username, date, content, is_deleted: isDeleted, replies = [],
     } = payload;
 
     this.id = id;
     this.username = username;
     this.date = date;
     this.content = this._setDeletedComment(content, isDeleted);
+    this.replies = replies;
   }
 
   _verifyPayload({

@@ -1,5 +1,6 @@
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
+const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const AddComment = require('../../../Domains/comments/entities/AddComment');
 const Comment = require('../../../Domains/comments/entities/Comment');
@@ -8,12 +9,18 @@ const CommentRepositoryPostgres = require('../CommentRepositoryPostgres');
 
 describe('CommentRepository postgres', () => {
   afterEach(async () => {
+    await RepliesTableTestHelper.cleanTable();
     await CommentsTableTestHelper.cleanTable();
     await ThreadsTableTestHelper.cleanTable();
     await UsersTableTestHelper.cleanTable();
   });
 
   afterAll(async () => {
+    await RepliesTableTestHelper.cleanTable();
+    await CommentsTableTestHelper.cleanTable();
+    await ThreadsTableTestHelper.cleanTable();
+    await UsersTableTestHelper.cleanTable();
+
     await pool.end();
   });
 
@@ -144,7 +151,7 @@ describe('CommentRepository postgres', () => {
 
       /** add 2 comment on first thread */
       const comment1Thread1 = await CommentsTableTestHelper.addComment({ content: 'a content 1 on thread 1' }, threadId1, 'user-123', 'com-1');
-      const comment2Thread1 = await CommentsTableTestHelper.addComment({ content: 'a content 2 on thread 2' }, threadId1, 'user-123', 'com2');
+      const comment2Thread1 = await CommentsTableTestHelper.addComment({ content: 'a content 2 on thread 2' }, threadId1, 'user-123', 'com-2');
 
       /** add 1 comment on second thread */
       await CommentsTableTestHelper.addComment({ content: 'a content 1 on thread 2' }, threadId2, 'user-123');

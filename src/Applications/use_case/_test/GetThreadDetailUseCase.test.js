@@ -3,6 +3,9 @@ const CommentRepository = require('../../../Domains/comments/CommentRepository')
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const ThreadDetailWithoutComments = require('../../../Domains/threads/entities/ThreadDetailWithoutComments');
 const CommentDetail = require('../../../Domains/comments/entities/CommentDetailWithReplies');
+const ReplyDetail = require('../../../Domains/replies/entities/ReplyDetail');
+const GetCommentDetailUseCase = require('../GetCommentDetailUseCase');
+const ReplyRepository = require('../../../Domains/replies/ReplyRepository');
 
 describe('GetThreadDetailUseCase', () => {
   it('should throw error when thread is not found', async () => {
@@ -30,6 +33,7 @@ describe('GetThreadDetailUseCase', () => {
     // Arrange
     const mockCommentRepository = new CommentRepository();
     const mockThreadRepository = new ThreadRepository();
+    const mockReplyRepository = new ReplyRepository();
 
     /** mocking */
     mockThreadRepository.getThreadDetailByThreadId = jest.fn()
@@ -42,11 +46,17 @@ describe('GetThreadDetailUseCase', () => {
       })));
     mockCommentRepository.getCommenstByThreadId = jest.fn()
       .mockImplementation(() => Promise.resolve([]));
+    mockReplyRepository.getRepliesByCommentId = jest.fn()
+      .mockImplementation(() => { throw new Error(); });
 
     /** create use case */
+    const getCommentDetailUseCase = new GetCommentDetailUseCase({
+      replyRepository: mockReplyRepository,
+    });
     const getThreadDetailUseCase = new GetThreadDetailUseCase({
       threadRepository: mockThreadRepository,
       commentRepository: mockCommentRepository,
+      getCommentDetailUseCase,
     });
 
     // Action
@@ -61,7 +71,7 @@ describe('GetThreadDetailUseCase', () => {
     expect(result.comments.length).toEqual(0);
   });
 
-  it('should get correct object of ThreadDetailWithComments', async () => {
+  it('should get correct object of ThreadDetailWithComments, with 0 replies', async () => {
     // Arrange
     const mockCommentRepository = new CommentRepository();
     const mockThreadRepository = new ThreadRepository();
@@ -83,6 +93,7 @@ describe('GetThreadDetailUseCase', () => {
         date: 'a date',
         content: 'a content',
         is_deleted: false,
+        replies: [],
       }),
     ];
     mockCommentRepository.getCommenstByThreadId = jest.fn()
@@ -104,5 +115,73 @@ describe('GetThreadDetailUseCase', () => {
     expect(result.date).toEqual('a date');
     expect(result.username).toEqual('username-1');
     expect(result.comments.length).toEqual(1);
+  });
+
+  it('should get correct object of ThreadDetailWithComments, with 1 replies', async () => {
+    // Arrange
+    const mockCommentRepository = new CommentRepository();
+    const mockThreadRepository = new ThreadRepository();
+    const mockReplyRepository = new ReplyRepository();
+
+    /** mocking */
+    mockThreadRepository.getThreadDetailByThreadId = jest.fn()
+      .mockImplementation(() => Promise.resolve(new ThreadDetailWithoutComments({
+        id: 'id',
+        title: 'a title',
+        body: 'a body',
+        date: 'a date',
+        username: 'username-1',
+      })));
+
+    const replies = [
+      new ReplyDetail({
+        id: 'reply-123',
+        username: 'username-1',
+        date: 'a date',
+        content: 'a reply',
+        is_deleted: false,
+      }),
+    ];
+
+    const comments = [
+      new CommentDetail({
+        id: 'comment-123',
+        username: 'username-1',
+        date: 'a date',
+        content: 'a content',
+        is_deleted: false,
+        replies: [],
+      }),
+    ];
+    mockCommentRepository.getCommenstByThreadId = jest.fn()
+      .mockImplementation(() => Promise.resolve(comments));
+    mockReplyRepository.getRepliesByCommentId = jest.fn()
+      .mockImplementation(() => Promise.resolve(replies));
+
+    const getCommentDetailUseCase = new GetCommentDetailUseCase({
+      replyRepository: mockReplyRepository,
+    });
+
+    /** create use case */
+    const getThreadDetailUseCase = new GetThreadDetailUseCase({
+      threadRepository: mockThreadRepository,
+      commentRepository: mockCommentRepository,
+      getCommentDetailUseCase,
+    });
+
+    // Action
+    const result = await getThreadDetailUseCase.execute('');
+
+    // Assert
+    expect(result.id).toEqual('id');
+    expect(result.title).toEqual('a title');
+    expect(result.body).toEqual('a body');
+    expect(result.date).toEqual('a date');
+    expect(result.username).toEqual('username-1');
+    expect(result.comments.length).toEqual(1);
+
+    expect(result.comments.length).toEqual(1);
+    const reply = result.comments[0].replies[0];
+    expect(reply.id).toEqual('reply-123');
   });
 });

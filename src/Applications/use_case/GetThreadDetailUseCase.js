@@ -1,10 +1,12 @@
 const ThreadDetailWithComments = require('../../Domains/threads/entities/ThreadDetailWithComments');
 const NotFoundError = require('../../Commons/exceptions/NotFoundError');
+const CommentDetailWithoutReplies = require('../../Domains/comments/entities/CommentDetailWithoutReplies');
 
 class GetThreadDetailUseCase {
-  constructor({ threadRepository, commentRepository }) {
+  constructor({ threadRepository, commentRepository, getCommentDetailUseCase }) {
     this._threadRepository = threadRepository;
     this._commentRepository = commentRepository;
+    this._getCommentDetailUseCase = getCommentDetailUseCase;
   }
 
   async execute(threadId) {
@@ -20,6 +22,8 @@ class GetThreadDetailUseCase {
     try {
       commentsDetail = await this._commentRepository
         .getCommenstByThreadId(threadId);
+
+      commentsDetail = await this._getRepliesForComment(commentsDetail);
     } catch (error) {
       // ignore
     }
@@ -30,6 +34,31 @@ class GetThreadDetailUseCase {
     };
 
     return new ThreadDetailWithComments(entityPayload);
+  }
+
+  async _getRepliesForComment(comments) {
+    const promises = comments.map(async (comment) => {
+      const { id: commentId } = comment;
+      try {
+        const replies = await this._getCommentDetailUseCase.execute(commentId);
+        return new CommentDetailWithoutReplies({
+          id: comment.id,
+          username: comment.username,
+          date: comment.date,
+          content: comment.content,
+          isDeleted: comment.isDeleted,
+          replies,
+        });
+      } catch (error) {
+        return comment;
+      }
+    });
+
+    return Promise.all(promises);
+  }
+
+  async getRepliesByCommentId(commentId) {
+    return this._getCommentDetailUseCase.execute(commentId);
   }
 }
 
