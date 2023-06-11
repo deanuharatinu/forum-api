@@ -6,7 +6,7 @@ describe('a CommentDetailWithReplies entities', () => {
     const payload = {};
 
     // Action and Assert
-    expect(() => new CommentDetailWithReplies(payload)).toThrowError('COMMENT_DETAIL.NOT_CONTAIN_NEEDED_PROPERTY');
+    expect(() => new CommentDetailWithReplies(payload)).toThrowError('COMMENT_DETAIL_WITH_REPLIES.NOT_CONTAIN_NEEDED_PROPERTY');
   });
 
   it('should throw error when payload did not meet data type specs', () => {
@@ -16,19 +16,21 @@ describe('a CommentDetailWithReplies entities', () => {
       username: true,
       date: 123,
       content: '123',
+      replies: [],
     };
 
     // Action and Assert
-    expect(() => new CommentDetailWithReplies(payload)).toThrowError('COMMENT_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
+    expect(() => new CommentDetailWithReplies(payload)).toThrowError('COMMENT_DETAIL_WITH_REPLIES.NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
 
-  it('should create object correctly', () => {
+  it('should create object correctly, and a reply with 0 array length', () => {
     // Arrange
     const payload = {
       id: 'comment-123',
       username: 'john doe',
       date: '2021-08-08T07:22:33.555Z"',
       content: 'this is a comment',
+      replies: [],
     };
 
     // Action
@@ -39,45 +41,6 @@ describe('a CommentDetailWithReplies entities', () => {
     expect(commentDetail.username).toEqual(payload.username);
     expect(commentDetail.date).toEqual(payload.date);
     expect(commentDetail.content).toEqual(payload.content);
-  });
-
-  it('should hide content if comment was deleted', () => {
-    // Arrange
-    const payload = {
-      id: 'comment-123',
-      username: 'john doe',
-      date: '2021-08-08T07:22:33.555Z"',
-      content: 'this is a comment',
-      is_deleted: true,
-    };
-
-    // Action
-    const commentDetail = new CommentDetailWithReplies(payload);
-
-    // Assert
-    expect(commentDetail.id).toEqual(payload.id);
-    expect(commentDetail.username).toEqual(payload.username);
-    expect(commentDetail.date).toEqual(payload.date);
-    expect(commentDetail.content).toEqual('**komentar telah dihapus**');
-  });
-
-  it('should show content if comment not deleted', () => {
-    // Arrange
-    const payload = {
-      id: 'comment-123',
-      username: 'john doe',
-      date: '2021-08-08T07:22:33.555Z"',
-      content: 'this is a comment',
-      is_deleted: false,
-    };
-
-    // Action
-    const commentDetail = new CommentDetailWithReplies(payload);
-
-    // Assert
-    expect(commentDetail.id).toEqual(payload.id);
-    expect(commentDetail.username).toEqual(payload.username);
-    expect(commentDetail.date).toEqual(payload.date);
-    expect(commentDetail.content).toEqual(payload.content);
+    expect(commentDetail.replies.length).toEqual(0);
   });
 });

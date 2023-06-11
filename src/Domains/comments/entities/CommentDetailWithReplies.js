@@ -4,34 +4,27 @@ class CommentDetailWithReplies {
     this._verifyPayload(payload);
 
     const {
-      id, username, date, content, is_deleted: isDeleted,
+      id, username, date, content, replies,
     } = payload;
 
     this.id = id;
     this.username = username;
     this.date = date;
-    this.content = this._setDeletedComment(content, isDeleted);
-    this.replies = [];
+    this.content = content;
+    this.replies = replies;
   }
 
   _verifyPayload({
-    id, username, date, content,
+    id, username, date, content, replies,
   }) {
-    if (!id || !username || !date || !content) {
-      throw new Error('COMMENT_DETAIL.NOT_CONTAIN_NEEDED_PROPERTY');
+    if (!id || !username || !date || !content || !replies) {
+      throw new Error('COMMENT_DETAIL_WITH_REPLIES.NOT_CONTAIN_NEEDED_PROPERTY');
     }
 
-    if (typeof id !== 'string' || typeof username !== 'string' || typeof date !== 'string' || typeof content !== 'string') {
-      throw new Error('COMMENT_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
+    if (typeof id !== 'string' || typeof username !== 'string' || typeof date !== 'string' || typeof content !== 'string'
+      || !Array.isArray(replies)) {
+      throw new Error('COMMENT_DETAIL_WITH_REPLIES.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
-  }
-
-  _setDeletedComment(content, isDeleted) {
-    if (isDeleted) {
-      return '**komentar telah dihapus**';
-    }
-
-    return content;
   }
 }
 

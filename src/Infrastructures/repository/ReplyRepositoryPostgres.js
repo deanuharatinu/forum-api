@@ -1,5 +1,6 @@
 const ReplyRepository = require('../../Domains/replies/ReplyRepository');
 const Reply = require('../../Domains/replies/entities/Reply');
+const ReplyDetail = require('../../Domains/replies/entities/ReplyDetail');
 
 class ReplyRepositoryPostgres extends ReplyRepository {
   constructor(pool, idGenerator) {
@@ -44,7 +45,20 @@ class ReplyRepositoryPostgres extends ReplyRepository {
   }
 
   async getRepliesByCommentId(commentId) {
-    throw new Error('REPLIES_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+    const query = {
+      text: `SELECT * FROM replies AS r
+            LEFT JOIN users AS u ON r.owner = u.id
+            WHERE r.comment_id = $1 ORDER BY r.date ASC`,
+      values: [commentId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new Error('reply tidak ditemukan');
+    }
+
+    return result.rows.map((payload) => new ReplyDetail(payload));
   }
 }
 
