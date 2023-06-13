@@ -96,5 +96,120 @@ describe('RepliesRepositoryPostgres', () => {
       expect(replyDetail2.content).toEqual('a reply 2');
       expect(replyDetail2.username).toEqual('test comment username');
     });
+
+    it('should return a ReplyDetail object with obfuscated content when deleted', async () => {
+      // Arrange
+      /** add user */
+      await UsersTableTestHelper.addUser({ id: 'user-123', username: 'test reply username' });
+
+      /** add thread */
+      const threadId = await ThreadsTableTestHelper.addNewThread({ id: 'thread-123', owner: 'user-123' });
+
+      /** add comment */
+      const comment = await CommentsTableTestHelper.addComment({ content: 'a comment' }, threadId, 'user-123', 'com-1');
+
+      /** add 1 reply */
+      const { id: replyId } = await RepliesTableTestHelper.addReply({ content: 'a reply 1' }, comment.id, 'user-123', 'reply-123');
+
+      const fakeIdGenerator = () => '123';
+      const replyRepository = new ReplyRepositoryPostgres(pool, fakeIdGenerator);
+
+      // Action
+      /** delete reply */
+      await replyRepository.deleteReplyById(replyId);
+      /** find reply by commentId */
+      const replies = await replyRepository.getRepliesByCommentId(comment.id);
+
+      // Assert
+      expect(replies.length).toEqual(1);
+      const replyDetail = replies[0];
+      expect(replyDetail.content).toEqual('**balasan telah dihapus**');
+      expect(replyDetail.username).toEqual('test reply username');
+    });
+  });
+
+  describe('deleteReplyById function', () => {
+    it('should delete reply when reply is found', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      const threadId = await ThreadsTableTestHelper.addNewThread({ owner: 'user-123' });
+      const comment = await CommentsTableTestHelper.addComment({ content: 'a content' }, threadId, 'user-123');
+      const reply = await RepliesTableTestHelper.addReply({ content: 'a reply' }, comment.id, 'user-123', 'reply-123456');
+      const fakeIdGenerator = () => '123';
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, fakeIdGenerator);
+
+      // Action
+      /** reply is found before delete */
+      await expect(replyRepositoryPostgres.findReplyById(reply.id))
+        .resolves.not.toThrowError();
+      await replyRepositoryPostgres.deleteReplyById(reply.id);
+
+      // Assert
+      /** reply is not found after delete */
+      await expect(replyRepositoryPostgres.findReplyById(reply.id))
+        .rejects
+        .toThrowError('reply tidak ditemukan');
+    });
+
+    it('should throw error when reply is not found', async () => {
+      // Arrange
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+      // Action and Assert
+      await expect(() => replyRepositoryPostgres.deleteReplyById('reply-123456'))
+        .rejects
+        .toThrowError('reply tidak ditemukan');
+    });
+  });
+
+  describe('findReplyById function', () => {
+    it('should throw error when reply is not found', async () => {
+      // Arrange
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+      // Action and Assert
+      await expect(() => replyRepositoryPostgres.findReplyById('reply-123456'))
+        .rejects
+        .toThrowError('reply tidak ditemukan');
+    });
+
+    it('should throw error when reply is already deleted', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      const threadId = await ThreadsTableTestHelper.addNewThread({ owner: 'user-123' });
+      const comment = await CommentsTableTestHelper.addComment({ content: 'a content' }, threadId, 'user-123');
+      const reply = await RepliesTableTestHelper.addReply({ content: 'a reply' }, comment.id, 'user-123', 'reply-1234');
+      const fakeIdGenerator = () => '123';
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, fakeIdGenerator);
+
+      // Action
+      /** comment is found before delete */
+      await expect(replyRepositoryPostgres.findReplyById(reply.id))
+        .resolves.not.toThrowError();
+      await replyRepositoryPostgres.deleteReplyById(reply.id);
+
+      // Assert
+      /** comment is not found after delete */
+      await expect(replyRepositoryPostgres.findReplyById(reply.id))
+        .rejects
+        .toThrowError('reply tidak ditemukan');
+    });
+
+    it('should return correct Reply object when reply is found', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      const threadId = await ThreadsTableTestHelper.addNewThread({ owner: 'user-123' });
+      const { id: commentId } = await CommentsTableTestHelper.addComment({ content: 'a content' }, threadId, 'user-123');
+      const reply = await RepliesTableTestHelper.addReply({ content: 'a reply' }, commentId, 'user-123', 'reply-1234');
+      const fakeIdGenerator = () => '123';
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, fakeIdGenerator);
+
+      // Action
+      const replyResult = await replyRepositoryPostgres.findReplyById(reply.id);
+
+      // Assert
+      expect(replyResult.owner).toEqual('user-123');
+      expect(replyResult.content).toEqual('a reply');
+    });
   });
 });

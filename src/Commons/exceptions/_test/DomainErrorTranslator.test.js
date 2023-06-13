@@ -70,6 +70,19 @@ describe('DomainErrorTranslator', () => {
       .toStrictEqual(new InvariantError('content harus string'));
   });
 
+  it('should translate DeleteReplyUseCase error correctly', () => {
+    expect(DomainErrorTranslator.translate(new Error('DELETE_REPLY_USE_CASE.USER_NOT_AUTHENTICATED')))
+      .toStrictEqual(new AuthenticationError('user tidak terautentikasi'));
+    expect(DomainErrorTranslator.translate(new Error('DELETE_REPLY_USE_CASE.USER_NOT_ALLOWED')))
+      .toStrictEqual(new AuthorizationError('user tidak memiliki akses'));
+    expect(DomainErrorTranslator.translate(new Error('DELETE_REPLY_USE_CASE.THREAD_NOT_FOUND')))
+      .toStrictEqual(new NotFoundError('thread tidak ditemukan'));
+    expect(DomainErrorTranslator.translate(new Error('DELETE_REPLY_USE_CASE.COMMENT_NOT_FOUND')))
+      .toStrictEqual(new NotFoundError('komentar tidak ditemukan'));
+    expect(DomainErrorTranslator.translate(new Error('DELETE_REPLY_USE_CASE.REPLY_NOT_FOUND')))
+      .toStrictEqual(new NotFoundError('balasan tidak ditemukan'));
+  });
+
   it('should return original error when error message is not needed to translate', () => {
     // Arrange
     const error = new Error('some_error_message');

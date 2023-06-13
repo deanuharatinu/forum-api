@@ -26,7 +26,16 @@ class ReplyRepositoryPostgres extends ReplyRepository {
   }
 
   async deleteReplyById(replyId) {
-    throw new Error('REPLIES_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+    const query = {
+      text: 'UPDATE replies SET is_deleted = $1 WHERE id = $2 RETURNING id, is_deleted',
+      values: [true, replyId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new Error('reply tidak ditemukan');
+    }
   }
 
   async findReplyById(replyId) {
@@ -38,6 +47,11 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     const result = await this._pool.query(query);
 
     if (!result.rowCount) {
+      throw new Error('reply tidak ditemukan');
+    }
+
+    const { is_deleted: isDeleted } = result.rows[0];
+    if (isDeleted) {
       throw new Error('reply tidak ditemukan');
     }
 

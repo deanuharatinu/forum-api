@@ -17,6 +17,8 @@ const ThreadRepositoryPostgres = require('./repository/ThreadRepositoryPostgres'
 const BcryptPasswordHash = require('./security/BcryptPasswordHash');
 const CommentRepository = require('../Domains/comments/CommentRepository');
 const CommentRepositoryPostgres = require('./repository/CommentRepositoryPostgres');
+const ReplyRepository = require('../Domains/replies/ReplyRepository');
+const ReplyRepositoryPostgres = require('./repository/ReplyRepositoryPostgres');
 
 // use case
 const AddUserUseCase = require('../Applications/use_case/AddUserUseCase');
@@ -31,9 +33,8 @@ const AddNewThreadUseCase = require('../Applications/use_case/AddNewThreadUseCas
 const AddCommentUseCase = require('../Applications/use_case/AddCommentUseCase');
 const DeleteCommentUseCase = require('../Applications/use_case/DeleteCommentUseCase');
 const GetThreadDetailUseCase = require('../Applications/use_case/GetThreadDetailUseCase');
+const GetCommentDetailUseCase = require('../Applications/use_case/GetCommentDetailUseCase');
 const AddReplyUseCase = require('../Applications/use_case/AddReplyUseCase');
-const ReplyRepository = require('../Domains/replies/ReplyRepository');
-const ReplyRepositoryPostgres = require('./repository/ReplyRepositoryPostgres');
 
 // creating container
 const container = createContainer();
@@ -134,6 +135,19 @@ container.register([
 // registering use cases
 container.register([
   {
+    key: GetCommentDetailUseCase.name,
+    Class: GetCommentDetailUseCase,
+    parameter: {
+      injectType: 'destructuring',
+      dependencies: [
+        {
+          name: 'replyRepository',
+          internal: ReplyRepository.name,
+        },
+      ],
+    },
+  },
+  {
     key: AddReplyUseCase.name,
     Class: AddReplyUseCase,
     parameter: {
@@ -167,6 +181,10 @@ container.register([
         {
           name: 'commentRepository',
           internal: CommentRepository.name,
+        },
+        {
+          name: 'getCommentDetailUseCase',
+          internal: GetCommentDetailUseCase.name,
         },
       ],
     },

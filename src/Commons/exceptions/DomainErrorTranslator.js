@@ -47,6 +47,12 @@ DomainErrorTranslator._directories = {
 
   'ADD_REPLY.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('content tidak boleh kosong'),
   'ADD_REPLY.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('content harus string'),
+
+  'DELETE_REPLY_USE_CASE.USER_NOT_AUTHENTICATED': new AuthenticationError('user tidak terautentikasi'),
+  'DELETE_REPLY_USE_CASE.USER_NOT_ALLOWED': new AuthorizationError('user tidak memiliki akses'),
+  'DELETE_REPLY_USE_CASE.THREAD_NOT_FOUND': new NotFoundError('thread tidak ditemukan'),
+  'DELETE_REPLY_USE_CASE.COMMENT_NOT_FOUND': new NotFoundError('komentar tidak ditemukan'),
+  'DELETE_REPLY_USE_CASE.REPLY_NOT_FOUND': new NotFoundError('balasan tidak ditemukan'),
 };
 
 module.exports = DomainErrorTranslator;
