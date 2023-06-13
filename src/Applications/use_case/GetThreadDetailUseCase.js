@@ -56,10 +56,6 @@ class GetThreadDetailUseCase {
 
     return Promise.all(promises);
   }
-
-  async getRepliesByCommentId(commentId) {
-    return this._getCommentDetailUseCase.execute(commentId);
-  }
 }
 
 module.exports = GetThreadDetailUseCase;

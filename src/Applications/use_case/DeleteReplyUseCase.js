@@ -10,8 +10,7 @@ class DeleteReplyUseCase {
 
   async execute(replyId, commentId, threadId, userId) {
     await this._verifyReply(replyId, commentId, threadId, userId);
-    // TODO ini harusnya nanti ada ditranslate errornya dari query
-    await this._replyRepository.deleteReplyById(commentId);
+    await this._replyRepository.deleteReplyById(replyId);
   }
 
   async _verifyReply(replyId, commentId, threadId, userId) {

@@ -200,9 +200,9 @@ describe('DeleteReplyUseCase', () => {
     });
 
     // Action and Assert
-    await deleteReplyUseCase.execute('', 'comment-123', '', 'user-123');
+    await deleteReplyUseCase.execute('reply-123', 'comment-123', '', 'user-123');
 
     // Assert
-    expect(mockReplyRepository.deleteReplyById).toBeCalledWith('comment-123');
+    expect(mockReplyRepository.deleteReplyById).toBeCalledWith('reply-123');
   });
 });
