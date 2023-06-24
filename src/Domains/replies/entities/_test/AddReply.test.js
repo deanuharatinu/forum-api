@@ -30,5 +30,8 @@ describe('an AddReply', () => {
 
     // Assert
     expect(addComment.content).toEqual(payload.content);
+    expect(addComment).toStrictEqual(new AddReply({
+      content: 'a new content',
+    }));
   });
 });

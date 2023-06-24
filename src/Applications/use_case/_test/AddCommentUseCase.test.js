@@ -33,7 +33,7 @@ describe('AddCommentUseCase', () => {
     mockUserRepository.verifyUserById = jest.fn()
       .mockImplementation(() => Promise.resolve('user-123'));
     mockThreadRepository.verifyThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve());
+      .mockImplementation(() => Promise.resolve('thread-123'));
 
     /** creating use case instance */
     const addCommentUseCase = new AddCommentUseCase({

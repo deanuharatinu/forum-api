@@ -33,5 +33,9 @@ describe('a NewThread entities', () => {
     // Assert
     expect(newThread.title).toEqual(payload.title);
     expect(newThread.body).toEqual(payload.body);
+    expect(newThread).toStrictEqual(new NewThread({
+      title: 'a title',
+      body: 'a body',
+    }));
   });
 });

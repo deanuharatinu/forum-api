@@ -42,5 +42,12 @@ describe('a CommentDetailWithReplies entities', () => {
     expect(commentDetail.date).toEqual(payload.date);
     expect(commentDetail.content).toEqual(payload.content);
     expect(commentDetail.replies.length).toEqual(0);
+    expect(commentDetail).toStrictEqual(new CommentDetailWithReplies({
+      id: 'comment-123',
+      username: 'john doe',
+      date: '2021-08-08T07:22:33.555Z"',
+      content: 'this is a comment',
+      replies: [],
+    }));
   });
 });

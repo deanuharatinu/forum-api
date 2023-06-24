@@ -29,6 +29,8 @@ describe('an AddComment', () => {
     const addComment = new AddComment(payload);
 
     // Assert
-    expect(addComment.content).toEqual(payload.content);
+    expect(addComment).toStrictEqual(new AddComment({
+      content: 'a new content',
+    }));
   });
 });

@@ -36,5 +36,10 @@ describe('a Comment entities', () => {
     expect(comment.id).toEqual(payload.id);
     expect(comment.content).toEqual(payload.content);
     expect(comment.owner).toEqual(payload.owner);
+    expect(comment).toStrictEqual(new Comment({
+      id: '123',
+      content: 'content',
+      owner: '123',
+    }));
   });
 });

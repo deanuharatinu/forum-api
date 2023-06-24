@@ -26,7 +26,6 @@ describe('a Thread entities', () => {
     const payload = {
       id: '123',
       title: 'title',
-      body: 'body',
       owner: 'owner-123',
     };
 
@@ -37,5 +36,10 @@ describe('a Thread entities', () => {
     expect(thread.id).toEqual(payload.id);
     expect(thread.title).toEqual(payload.title);
     expect(thread.owner).toEqual(payload.owner);
+    expect(thread).toStrictEqual(new Thread({
+      id: '123',
+      title: 'title',
+      owner: 'owner-123',
+    }));
   });
 });

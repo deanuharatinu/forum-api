@@ -36,5 +36,11 @@ describe('a ReplyDetail', () => {
 
     // Assert
     expect(addComment.content).toEqual(payload.content);
+    expect(addComment).toStrictEqual(new ReplyDetail({
+      id: 'reply-123',
+      content: 'new content',
+      date: '123123',
+      username: 'username',
+    }));
   });
 });

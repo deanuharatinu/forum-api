@@ -36,5 +36,10 @@ describe('a Reply', () => {
     expect(addComment.id).toEqual(payload.id);
     expect(addComment.content).toEqual(payload.content);
     expect(addComment.owner).toEqual(payload.owner);
+    expect(addComment).toStrictEqual(new Reply({
+      id: 'reply-1231',
+      content: 'a new content',
+      owner: 'user-12312',
+    }));
   });
 });

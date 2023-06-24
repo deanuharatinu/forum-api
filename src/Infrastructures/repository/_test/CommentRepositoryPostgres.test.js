@@ -1,3 +1,4 @@
+/* eslint-disable no-promise-executor-return */
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper');
@@ -8,6 +9,13 @@ const pool = require('../../database/postgres/pool');
 const CommentRepositoryPostgres = require('../CommentRepositoryPostgres');
 
 describe('CommentRepository postgres', () => {
+  beforeEach(async () => {
+    await RepliesTableTestHelper.cleanTable();
+    await CommentsTableTestHelper.cleanTable();
+    await ThreadsTableTestHelper.cleanTable();
+    await UsersTableTestHelper.cleanTable();
+  });
+
   afterEach(async () => {
     await RepliesTableTestHelper.cleanTable();
     await CommentsTableTestHelper.cleanTable();
@@ -142,6 +150,8 @@ describe('CommentRepository postgres', () => {
 
     it('should return a list of correct CommentDetail object', async () => {
       // Arrange
+      await RepliesTableTestHelper.cleanTable();
+      await CommentsTableTestHelper.cleanTable();
       /** add user */
       await UsersTableTestHelper.addUser({ id: 'user-123', username: 'test comment username' });
 
@@ -151,7 +161,11 @@ describe('CommentRepository postgres', () => {
 
       /** add 2 comment on first thread */
       const comment1Thread1 = await CommentsTableTestHelper.addComment({ content: 'a content 1 on thread 1' }, threadId1, 'user-123', 'com-1');
-      const comment2Thread1 = await CommentsTableTestHelper.addComment({ content: 'a content 2 on thread 2' }, threadId1, 'user-123', 'com-2');
+      // delay
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      const comment2Thread1 = await CommentsTableTestHelper.addComment({ content: 'a content 2 on thread 1' }, threadId1, 'user-123', 'com-2');
+      // delay
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       /** add 1 comment on second thread */
       await CommentsTableTestHelper.addComment({ content: 'a content 1 on thread 2' }, threadId2, 'user-123');
@@ -166,10 +180,14 @@ describe('CommentRepository postgres', () => {
       // Assert
       expect(commentsDetail.length).toEqual(2);
       const commentResult1 = commentsDetail[0];
-      expect(commentResult1.id).toEqual(comment1Thread1.id);
-      expect(commentResult1.username).toEqual('test comment username');
       const commentResult2 = commentsDetail[1];
+
+      expect(commentResult1.id).toEqual(comment1Thread1.id);
+      expect(commentResult1.content).toEqual('a content 1 on thread 1');
+      expect(commentResult1.username).toEqual('test comment username');
+
       expect(commentResult2.id).toEqual(comment2Thread1.id);
+      expect(commentResult2.content).toEqual('a content 2 on thread 1');
       expect(commentResult2.username).toEqual('test comment username');
     });
 
@@ -182,9 +200,13 @@ describe('CommentRepository postgres', () => {
       const threadId = await ThreadsTableTestHelper.addNewThread({ id: 'thread1-123', owner: 'user-123' });
 
       /** add 3 comment on first thread */
-      const comment1 = await CommentsTableTestHelper.addComment({ content: 'a content 1 on thread 1' }, threadId, 'user-123', 'com-1');
-      const comment2 = await CommentsTableTestHelper.addComment({ content: 'a content 2 on thread 2' }, threadId, 'user-123', 'com-2');
-      const comment3 = await CommentsTableTestHelper.addComment({ content: 'a content 2 on thread 2' }, threadId, 'user-123', 'com-3');
+      const comment1 = await CommentsTableTestHelper.addComment({ content: 'a content 1 on thread 1' }, threadId, 'user-123', 'com-3');
+      // delay
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      const comment2 = await CommentsTableTestHelper.addComment({ content: 'a content 2 on thread 1' }, threadId, 'user-123', 'com-4');
+      // delay
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      const comment3 = await CommentsTableTestHelper.addComment({ content: 'a content 3 on thread 1' }, threadId, 'user-123', 'com-5');
 
       const fakeIdGenerator = () => '123';
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
@@ -195,15 +217,21 @@ describe('CommentRepository postgres', () => {
 
       // Assert
       expect(commentsDetail.length).toEqual(3);
-      /** first comment */
       const commentResult1 = commentsDetail[0];
-      expect(commentResult1.id).toEqual(comment1.id);
-      /** second comment */
       const commentResult2 = commentsDetail[1];
-      expect(commentResult2.id).toEqual(comment2.id);
-      /** third comment */
       const commentResult3 = commentsDetail[2];
+
+      /** first comment */
+      expect(commentResult1.id).toEqual(comment1.id);
+      expect(commentResult1.content).toEqual('a content 1 on thread 1');
+
+      /** second comment */
+      expect(commentResult2.id).toEqual(comment2.id);
+      expect(commentResult2.content).toEqual('a content 2 on thread 1');
+
+      /** third comment */
       expect(commentResult3.id).toEqual(comment3.id);
+      expect(commentResult3.content).toEqual('a content 3 on thread 1');
     });
   });
 });

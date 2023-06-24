@@ -45,5 +45,13 @@ describe('a ThreadDetailWithComments entities', () => {
     expect(thread.date).toEqual(payload.date);
     expect(thread.username).toEqual(payload.username);
     expect(thread.comments).toEqual(payload.comments);
+    expect(thread).toStrictEqual(new ThreadDetailWithComments({
+      id: '123',
+      title: 'a title',
+      body: 'a body',
+      date: '12312312',
+      username: 'username',
+      comments: [],
+    }));
   });
 });

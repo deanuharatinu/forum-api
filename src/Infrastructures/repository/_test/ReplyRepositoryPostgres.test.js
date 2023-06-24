@@ -1,3 +1,4 @@
+/* eslint-disable no-promise-executor-return */
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
@@ -80,6 +81,8 @@ describe('RepliesRepositoryPostgres', () => {
 
       /** add 2 reply on comment */
       await RepliesTableTestHelper.addReply({ content: 'a reply 1' }, comment.id, 'user-123', 'reply1-1234');
+      // delay
+      await new Promise((resolve) => setTimeout(resolve, 300));
       await RepliesTableTestHelper.addReply({ content: 'a reply 2' }, comment.id, 'user-123', 'reply2-1234');
 
       // Action

@@ -42,5 +42,12 @@ describe('a ThreadDetailWithoutComments entities', () => {
     expect(thread.body).toEqual(payload.body);
     expect(thread.date).toEqual(payload.date);
     expect(thread.username).toEqual(payload.username);
+    expect(thread).toStrictEqual(new ThreadDetailWithoutComments({
+      id: '123',
+      title: 'a title',
+      body: 'a body',
+      date: '12312312',
+      username: 'username',
+    }));
   });
 });
