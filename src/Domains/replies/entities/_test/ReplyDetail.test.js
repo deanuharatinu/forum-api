@@ -32,15 +32,55 @@ describe('a ReplyDetail', () => {
     };
 
     // Action
-    const addComment = new ReplyDetail(payload);
+    const addReply = new ReplyDetail(payload);
 
     // Assert
-    expect(addComment.content).toEqual(payload.content);
-    expect(addComment).toStrictEqual(new ReplyDetail({
+    expect(addReply.content).toEqual(payload.content);
+    expect(addReply).toStrictEqual(new ReplyDetail({
       id: 'reply-123',
       content: 'new content',
       date: '123123',
       username: 'username',
     }));
+  });
+
+  it('should hide content if reply was deleted', () => {
+    // Arrange
+    const payload = {
+      id: 'reply-123',
+      content: 'new content',
+      date: '123123',
+      username: 'username',
+      is_deleted: true,
+    };
+
+    // Action
+    const addReply = new ReplyDetail(payload);
+
+    // Assert
+    expect(addReply.id).toEqual(payload.id);
+    expect(addReply.content).toEqual('**balasan telah dihapus**');
+    expect(addReply.date).toEqual(payload.date);
+    expect(addReply.username).toEqual(payload.username);
+  });
+
+  it('should show content if reply is not deleted', () => {
+    // Arrange
+    const payload = {
+      id: 'reply-123',
+      content: 'new content',
+      date: '123123',
+      username: 'username',
+      is_deleted: false,
+    };
+
+    // Action
+    const addReply = new ReplyDetail(payload);
+
+    // Assert
+    expect(addReply.id).toEqual(payload.id);
+    expect(addReply.content).toEqual(payload.content);
+    expect(addReply.date).toEqual(payload.date);
+    expect(addReply.username).toEqual(payload.username);
   });
 });
