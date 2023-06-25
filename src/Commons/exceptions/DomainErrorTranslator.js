@@ -28,12 +28,8 @@ DomainErrorTranslator._directories = {
   'NEW_THREAD.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('tidak dapat menambahkan thread karena properti yang dibutuhkan tidak sesuai'),
   'NEW_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('title dan body harus string'),
 
-  'ADD_NEW_THREAD_USE_CASE.USER_NOT_ALLOWED': new AuthenticationError('user tidak dikenal'),
-
   'ADD_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('content tidak boleh kosong'),
   'ADD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('content harus string'),
-
-  'ADD_COMMENT_USE_CASE.THREAD_NOT_FOUND': new NotFoundError('thread tidak ditemukan'),
 
   'DELETE_COMMENT_USE_CASE.THREAD_NOT_FOUND': new NotFoundError('thread tidak ditemukan'),
   'DELETE_COMMENT_USE_CASE.USER_NOT_ALLOWED': new AuthorizationError('user tidak memiliki akses'),
@@ -41,9 +37,6 @@ DomainErrorTranslator._directories = {
   'DELETE_COMMENT_USE_CASE.COMMENT_NOT_FOUND': new NotFoundError('komentar tidak ditemukan'),
 
   'GET_THREAD_DETAIL_USE_CASE.THREAD_NOT_FOUND': new NotFoundError('thread tidak ditemukan'),
-
-  'ADD_REPLY_USE_CASE.THREAD_NOT_FOUND': new NotFoundError('thread tidak ditemukan'),
-  'ADD_REPLY_USE_CASE.COMMENT_NOT_FOUND': new NotFoundError('komentar tidak ditemukan'),
 
   'ADD_REPLY.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('content tidak boleh kosong'),
   'ADD_REPLY.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('content harus string'),

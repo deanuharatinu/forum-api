@@ -52,6 +52,11 @@ describe('CommentRepository postgres', () => {
         content: addComment.content,
         owner: 'user-123',
       }));
+      const persistedResult = await CommentsTableTestHelper.findCommentById(result.id);
+      expect(persistedResult).not.toBe(undefined);
+      expect(persistedResult.id).toEqual(result.id);
+      expect(persistedResult.content).toEqual(result.content);
+      expect(persistedResult.owner).toEqual(result.owner);
     });
   });
 
@@ -75,6 +80,10 @@ describe('CommentRepository postgres', () => {
       await expect(commentRepositoryPostgres.findCommentById(comment.id))
         .rejects
         .toThrowError('comment tidak ditemukan');
+
+      const persistedResult = await CommentsTableTestHelper.findCommentById(comment.id);
+      expect(persistedResult).not.toBe(undefined);
+      expect(persistedResult.is_deleted).toEqual(true);
     });
 
     it('should throw error when comment is not found', async () => {
@@ -132,6 +141,7 @@ describe('CommentRepository postgres', () => {
       const commentResult = await commentRepositoryPostgres.findCommentById(commentId);
 
       // Assert
+      expect(commentResult.id).toEqual(commentId);
       expect(commentResult.owner).toEqual('user-123');
       expect(commentResult.content).toEqual('a content');
     });
@@ -232,6 +242,57 @@ describe('CommentRepository postgres', () => {
       /** third comment */
       expect(commentResult3.id).toEqual(comment3.id);
       expect(commentResult3.content).toEqual('a content 3 on thread 1');
+    });
+  });
+
+  describe('verifyCommentAvailabilityById function', () => {
+    it('should throw error when comment is not found', async () => {
+      // Arrange
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+      // Action and Assert
+      await expect(() => commentRepositoryPostgres.verifyCommentAvailabilityById('comment-123456'))
+        .rejects
+        .toThrowError('comment tidak ditemukan');
+    });
+
+    it('should throw error when comment is already deleted', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      const threadId = await ThreadsTableTestHelper.addNewThread({ owner: 'user-123' });
+      const comment = await CommentsTableTestHelper.addComment({ content: 'a content' }, threadId, 'user-123');
+      const fakeIdGenerator = () => '123';
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
+
+      // Action
+      /** comment is found before delete */
+      await expect(commentRepositoryPostgres.verifyCommentAvailabilityById(comment.id))
+        .resolves.not.toThrowError();
+      await commentRepositoryPostgres.deleteCommentById(comment.id);
+
+      // Assert
+      /** comment is not found after delete */
+      await expect(commentRepositoryPostgres.verifyCommentAvailabilityById(comment.id))
+        .rejects
+        .toThrowError('comment tidak ditemukan');
+    });
+
+    it('should return correct Comment object when comment is found', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      const threadId = await ThreadsTableTestHelper.addNewThread({ owner: 'user-123' });
+      const { id: commentId } = await CommentsTableTestHelper.addComment({ content: 'a content' }, threadId, 'user-123');
+      const fakeIdGenerator = () => '123';
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
+
+      // Action
+      const commentResult = await commentRepositoryPostgres
+        .verifyCommentAvailabilityById(commentId);
+
+      // Assert
+      expect(commentResult.id).toEqual(commentId);
+      expect(commentResult.owner).toEqual('user-123');
+      expect(commentResult.content).toEqual('a content');
     });
   });
 });

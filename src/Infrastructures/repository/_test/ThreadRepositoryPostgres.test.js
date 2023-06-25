@@ -49,16 +49,19 @@ describe('ThreadRepository postgres', () => {
         title: newThread.title,
         owner: expectedOwner,
       }));
+      const result = await ThreadsTableTestHelper.findThreadById('thread-123');
+      expect(result).not.toBe(undefined);
+      expect(result.id).toEqual('thread-123');
     });
   });
 
-  describe('verifyThreadById function', () => {
+  describe('verifyThreadAvailabilityById function', () => {
     it('should throw error when thread is not found', async () => {
       // Arrange
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
 
       // Action and Assert
-      await expect(threadRepositoryPostgres.verifyThreadById(''))
+      await expect(threadRepositoryPostgres.verifyThreadAvailabilityById(''))
         .rejects
         .toThrowError('thread tidak ditemukan');
     });
@@ -74,7 +77,7 @@ describe('ThreadRepository postgres', () => {
       const thread = await threadRepositoryPostgres.addNewThread(newThread, expectedOwner);
 
       // Action
-      const threadId = await threadRepositoryPostgres.verifyThreadById(thread.id);
+      const threadId = await threadRepositoryPostgres.verifyThreadAvailabilityById(thread.id);
       expect(threadId).toEqual(thread.id);
     });
   });
@@ -85,7 +88,7 @@ describe('ThreadRepository postgres', () => {
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
 
       // Action and Assert
-      await expect(threadRepositoryPostgres.verifyThreadById(''))
+      await expect(threadRepositoryPostgres.verifyThreadAvailabilityById(''))
         .rejects
         .toThrowError('thread tidak ditemukan');
     });

@@ -1,4 +1,5 @@
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
+const AuthenticationError = require('../../../Commons/exceptions/AuthenticationError');
 const InvariantError = require('../../../Commons/exceptions/InvariantError');
 const RegisterUser = require('../../../Domains/users/entities/RegisterUser');
 const RegisteredUser = require('../../../Domains/users/entities/RegisteredUser');
@@ -131,7 +132,7 @@ describe('UserRepositoryPostgres', () => {
       // Action and Assert
       await expect(userRepositoryPostgres.verifyUserById({ id: 'user-123', username: 'dicoding' }))
         .rejects
-        .toThrowError(InvariantError);
+        .toThrowError(AuthenticationError);
     });
 
     it('should return id correctly when user is found', async () => {

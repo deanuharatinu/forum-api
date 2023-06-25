@@ -3,6 +3,8 @@ const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const UserRepository = require('../../../Domains/users/UserRepository');
 const AddCommentUseCase = require('../AddCommentUseCase');
 const Comment = require('../../../Domains/comments/entities/Comment');
+const AuthenticationError = require('../../../Commons/exceptions/AuthenticationError');
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 
 describe('AddCommentUseCase', () => {
   let mockCommentRepository;
@@ -27,12 +29,14 @@ describe('AddCommentUseCase', () => {
       owner: 'user-123',
     });
 
+    const mockThreadId = 'thread-123';
+
     /** mocking */
     mockCommentRepository.addComment = jest.fn()
       .mockImplementation(() => Promise.resolve(mockComment));
     mockUserRepository.verifyUserById = jest.fn()
       .mockImplementation(() => Promise.resolve('user-123'));
-    mockThreadRepository.verifyThreadById = jest.fn()
+    mockThreadRepository.verifyThreadAvailabilityById = jest.fn()
       .mockImplementation(() => Promise.resolve('thread-123'));
 
     /** creating use case instance */
@@ -43,9 +47,15 @@ describe('AddCommentUseCase', () => {
     });
 
     // Action
-    const comment = await addCommentUseCase.execute(useCasePayload, 'user-123', 'thread-123');
+    const comment = await addCommentUseCase.execute(useCasePayload, 'user-123', mockThreadId);
 
     // Assert
+    expect(mockUserRepository.verifyUserById)
+      .toBeCalledWith(mockComment.owner);
+    expect(mockThreadRepository.verifyThreadAvailabilityById)
+      .toBeCalledWith(mockThreadId);
+    expect(mockCommentRepository.addComment)
+      .toBeCalledWith(useCasePayload, mockThreadId, 'user-123');
     expect(comment).toStrictEqual(new Comment({
       id: 'comment-123',
       content: useCasePayload.content,
@@ -61,7 +71,7 @@ describe('AddCommentUseCase', () => {
 
     /** mocking */
     mockUserRepository.verifyUserById = jest.fn()
-      .mockImplementation(() => { throw new Error(); });
+      .mockImplementation(() => { throw new AuthenticationError('user tidak dikenal'); });
 
     /** creating use case instance */
     const addCommentUseCase = new AddCommentUseCase({
@@ -73,7 +83,7 @@ describe('AddCommentUseCase', () => {
     // Action and Assert
     await expect(addCommentUseCase.execute(useCasePayload, 'user-123', 'thread-123'))
       .rejects
-      .toThrowError('ADD_COMMENT_USE_CASE.USER_NOT_ALLOWED');
+      .toThrowError('user tidak dikenal');
   });
 
   it('should throw error when thread is not found', async () => {
@@ -86,8 +96,8 @@ describe('AddCommentUseCase', () => {
     /** mocking */
     mockUserRepository.verifyUserById = jest.fn()
       .mockImplementation(() => Promise.resolve());
-    mockThreadRepository.verifyThreadById = jest.fn()
-      .mockImplementation(() => { throw new Error(); });
+    mockThreadRepository.verifyThreadAvailabilityById = jest.fn()
+      .mockImplementation(() => { throw new NotFoundError('thread tidak ditemukan'); });
 
     /** creating use case instance */
     const addCommentUseCase = new AddCommentUseCase({
@@ -96,9 +106,9 @@ describe('AddCommentUseCase', () => {
       threadRepository: mockThreadRepository,
     });
 
-    // Action
+    // Action and Assert
     await expect(addCommentUseCase.execute(useCasePayload, 'user-123', 'thread-123'))
       .rejects
-      .toThrowError('ADD_COMMENT_USE_CASE.THREAD_NOT_FOUND');
+      .toThrowError('thread tidak ditemukan');
   });
 });

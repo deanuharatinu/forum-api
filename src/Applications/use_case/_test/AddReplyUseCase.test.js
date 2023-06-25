@@ -3,6 +3,7 @@ const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const CommentRepository = require('../../../Domains/comments/CommentRepository');
 const ReplyRepository = require('../../../Domains/replies/ReplyRepository');
 const Reply = require('../../../Domains/replies/entities/Reply');
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 
 describe('AddReplyUseCase', () => {
   it('should throw error when reply not found', async () => {
@@ -11,8 +12,8 @@ describe('AddReplyUseCase', () => {
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
 
-    mockThreadRepository.verifyThreadById = jest.fn()
-      .mockImplementation(() => { throw new Error(); });
+    mockThreadRepository.verifyThreadAvailabilityById = jest.fn()
+      .mockImplementation(() => { throw new NotFoundError('thread tidak ditemukan'); });
 
     /** create use case */
     const addReplyUseCase = new AddReplyUseCase({
@@ -28,7 +29,7 @@ describe('AddReplyUseCase', () => {
     // Action
     await expect(addReplyUseCase.execute(useCasePayload, '', '', ''))
       .rejects
-      .toThrowError('ADD_REPLY_USE_CASE.THREAD_NOT_FOUND');
+      .toThrowError('thread tidak ditemukan');
   });
 
   it('should throw error when comment not found', async () => {
@@ -37,10 +38,10 @@ describe('AddReplyUseCase', () => {
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
 
-    mockThreadRepository.verifyThreadById = jest.fn()
+    mockThreadRepository.verifyThreadAvailabilityById = jest.fn()
       .mockImplementation(() => Promise.resolve('thread-123'));
-    mockCommentRepository.findCommentById = jest.fn()
-      .mockImplementation(() => { throw new Error(); });
+    mockCommentRepository.verifyCommentAvailabilityById = jest.fn()
+      .mockImplementation(() => { throw new NotFoundError('comment tidak ditemukan'); });
 
     /** create use case */
     const addReplyUseCase = new AddReplyUseCase({
@@ -56,7 +57,7 @@ describe('AddReplyUseCase', () => {
     // Action
     await expect(addReplyUseCase.execute(useCasePayload, '', ''))
       .rejects
-      .toThrowError('ADD_REPLY_USE_CASE.COMMENT_NOT_FOUND');
+      .toThrowError('comment tidak ditemukan');
   });
 
   it('should orchestrating the add reply action correctly', async () => {
@@ -75,9 +76,9 @@ describe('AddReplyUseCase', () => {
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
 
-    mockThreadRepository.verifyThreadById = jest.fn()
+    mockThreadRepository.verifyThreadAvailabilityById = jest.fn()
       .mockImplementation(() => Promise.resolve('thread-123'));
-    mockCommentRepository.findCommentById = jest.fn()
+    mockCommentRepository.verifyCommentAvailabilityById = jest.fn()
       .mockImplementation(() => Promise.resolve());
     mockReplyRepository.addReply = jest.fn()
       .mockImplementation(() => Promise.resolve(mockReply));
@@ -97,8 +98,8 @@ describe('AddReplyUseCase', () => {
     expect(result.content).toEqual(mockReply.content);
     expect(result.owner).toEqual(mockReply.owner);
 
-    expect(mockThreadRepository.verifyThreadById).toBeCalledWith('thread-123');
-    expect(mockCommentRepository.findCommentById).toBeCalledWith('comment-123');
+    expect(mockThreadRepository.verifyThreadAvailabilityById).toBeCalledWith('thread-123');
+    expect(mockCommentRepository.verifyCommentAvailabilityById).toBeCalledWith('comment-123');
     expect(mockReplyRepository.addReply).toBeCalledWith(payload, 'comment-123', 'user-123');
   });
 });

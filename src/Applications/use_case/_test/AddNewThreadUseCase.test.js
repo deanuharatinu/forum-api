@@ -2,6 +2,7 @@ const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const Thread = require('../../../Domains/threads/entities/Thread');
 const UserRepository = require('../../../Domains/users/UserRepository');
 const AddNewThreadUseCase = require('../AddNewThreadUseCase');
+const InvariantError = require('../../../Commons/exceptions/InvariantError');
 
 describe('AddNewThreadUseCase', () => {
   let mockThreadRepository;
@@ -61,7 +62,7 @@ describe('AddNewThreadUseCase', () => {
 
     /** mocking */
     mockUserRepository.verifyUserById = jest.fn()
-      .mockImplementation(() => { throw new Error(); });
+      .mockImplementation(() => { throw new InvariantError('user tidak dikenal'); });
 
     /** creating use case instance */
     const addNewThreadUseCase = new AddNewThreadUseCase({
@@ -72,6 +73,6 @@ describe('AddNewThreadUseCase', () => {
     // Action and Assert
     await expect(addNewThreadUseCase.execute(useCasePayload, 'user-123'))
       .rejects
-      .toThrowError('ADD_NEW_THREAD_USE_CASE.USER_NOT_ALLOWED');
+      .toThrowError('user tidak dikenal');
   });
 });

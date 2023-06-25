@@ -14,7 +14,7 @@ class DeleteCommentUseCase {
     await this._verifyUser(userId);
 
     try {
-      await this._threadRepository.verifyThreadById(threadId);
+      await this._threadRepository.verifyThreadAvailabilityById(threadId);
     } catch (error) {
       throw new Error('DELETE_COMMENT_USE_CASE.THREAD_NOT_FOUND');
     }

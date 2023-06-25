@@ -18,6 +18,17 @@ const RepliesTableTestHelper = {
 
     return result.rows[0];
   },
+
+  async findReplyById(replyId) {
+    const query = {
+      text: 'SELECT * FROM replies WHERE id = $1',
+      values: [replyId],
+    };
+
+    const result = await pool.query(query);
+
+    return result.rows[0];
+  },
 };
 
 module.exports = RepliesTableTestHelper;

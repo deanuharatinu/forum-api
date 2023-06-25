@@ -51,6 +51,11 @@ describe('RepliesRepositoryPostgres', () => {
         content: addReply.content,
         owner: 'user-123',
       }));
+      const persistedResult = await RepliesTableTestHelper.findReplyById(result.id);
+      expect(persistedResult).not.toBe(undefined);
+      expect(persistedResult.id).toEqual('reply-123');
+      expect(persistedResult.content).toEqual(addReply.content);
+      expect(persistedResult.owner).toEqual('user-123');
     });
   });
 
@@ -80,10 +85,10 @@ describe('RepliesRepositoryPostgres', () => {
       const replyRepository = new ReplyRepositoryPostgres(pool, fakeIdGenerator);
 
       /** add 2 reply on comment */
-      await RepliesTableTestHelper.addReply({ content: 'a reply 1' }, comment.id, 'user-123', 'reply1-1234');
+      const replyId1 = await RepliesTableTestHelper.addReply({ content: 'a reply 1' }, comment.id, 'user-123', 'reply1-1234');
       // delay
       await new Promise((resolve) => setTimeout(resolve, 300));
-      await RepliesTableTestHelper.addReply({ content: 'a reply 2' }, comment.id, 'user-123', 'reply2-1234');
+      const replyId2 = await RepliesTableTestHelper.addReply({ content: 'a reply 2' }, comment.id, 'user-123', 'reply2-1234');
 
       // Action
       /** find reply by commentId */
@@ -93,9 +98,12 @@ describe('RepliesRepositoryPostgres', () => {
       expect(replyDetail.length).toEqual(2);
       const replyDetail1 = replyDetail[0];
       const replyDetail2 = replyDetail[1];
+
+      expect(replyDetail1.id).toEqual(replyId1.id);
       expect(replyDetail1.content).toEqual('a reply 1');
       expect(replyDetail1.username).toEqual('test comment username');
 
+      expect(replyDetail2.id).toEqual(replyId2.id);
       expect(replyDetail2.content).toEqual('a reply 2');
       expect(replyDetail2.username).toEqual('test comment username');
     });
@@ -152,6 +160,8 @@ describe('RepliesRepositoryPostgres', () => {
       await expect(replyRepositoryPostgres.findReplyById(reply.id))
         .rejects
         .toThrowError('reply tidak ditemukan');
+      const persistedResult = await RepliesTableTestHelper.findReplyById(reply.id);
+      expect(persistedResult.is_deleted).toEqual(true);
     });
 
     it('should throw error when reply is not found', async () => {
@@ -211,6 +221,7 @@ describe('RepliesRepositoryPostgres', () => {
       const replyResult = await replyRepositoryPostgres.findReplyById(reply.id);
 
       // Assert
+      expect(replyResult.id).toEqual('reply-1234');
       expect(replyResult.owner).toEqual('user-123');
       expect(replyResult.content).toEqual('a reply');
     });

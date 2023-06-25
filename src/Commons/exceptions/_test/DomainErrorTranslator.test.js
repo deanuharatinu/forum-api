@@ -23,21 +23,11 @@ describe('DomainErrorTranslator', () => {
       .toStrictEqual(new InvariantError('title dan body harus string'));
   });
 
-  it('should translate AddNewThread error correctly', () => {
-    expect(DomainErrorTranslator.translate(new Error('ADD_NEW_THREAD_USE_CASE.USER_NOT_ALLOWED')))
-      .toStrictEqual(new AuthenticationError('user tidak dikenal'));
-  });
-
   it('should translate AddComment error correctly', () => {
     expect(DomainErrorTranslator.translate(new Error('ADD_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY')))
       .toStrictEqual(new InvariantError('content tidak boleh kosong'));
     expect(DomainErrorTranslator.translate(new Error('ADD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION')))
       .toStrictEqual(new InvariantError('content harus string'));
-  });
-
-  it('should translate AddCommentUseCase error correctly', () => {
-    expect(DomainErrorTranslator.translate(new Error('ADD_COMMENT_USE_CASE.THREAD_NOT_FOUND')))
-      .toStrictEqual(new NotFoundError('thread tidak ditemukan'));
   });
 
   it('should translate DeleteCommentUseCase error correctly', () => {
@@ -54,13 +44,6 @@ describe('DomainErrorTranslator', () => {
   it('should translate GetThreadDetailUseCase error correctly', () => {
     expect(DomainErrorTranslator.translate(new NotFoundError('GET_THREAD_DETAIL_USE_CASE.THREAD_NOT_FOUND')))
       .toStrictEqual(new NotFoundError('thread tidak ditemukan'));
-  });
-
-  it('should translate AddReplylUseCase error correctly', () => {
-    expect(DomainErrorTranslator.translate(new Error('ADD_REPLY_USE_CASE.THREAD_NOT_FOUND')))
-      .toStrictEqual(new NotFoundError('thread tidak ditemukan'));
-    expect(DomainErrorTranslator.translate(new Error('ADD_REPLY_USE_CASE.COMMENT_NOT_FOUND')))
-      .toStrictEqual(new NotFoundError('komentar tidak ditemukan'));
   });
 
   it('should translate AddReply error correctly', () => {

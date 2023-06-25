@@ -18,6 +18,17 @@ const CommentsTableTestHelper = {
 
     return result.rows[0];
   },
+
+  async findCommentById(commentId) {
+    const query = {
+      text: 'SELECT * FROM comments WHERE id = $1',
+      values: [commentId],
+    };
+
+    const result = await pool.query(query);
+
+    return result.rows[0];
+  },
 };
 
 module.exports = CommentsTableTestHelper;

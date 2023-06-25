@@ -8,17 +8,9 @@ class AddNewThreadUseCase {
 
   async execute(useCasePayload, ownerId) {
     const newThread = new NewThread(useCasePayload);
-    await this._verifyUser(ownerId);
+    await this._userRepository.verifyUserById(ownerId);
     const thread = await this._threadRepository.addNewThread(newThread, ownerId);
     return thread;
-  }
-
-  async _verifyUser(ownerId) {
-    try {
-      await this._userRepository.verifyUserById(ownerId);
-    } catch (error) {
-      throw new Error('ADD_NEW_THREAD_USE_CASE.USER_NOT_ALLOWED');
-    }
   }
 }
 

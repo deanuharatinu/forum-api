@@ -20,7 +20,7 @@ describe('DeleteCommentUseCase', () => {
       .mockImplementation(() => Promise.resolve(new Comment({
         id: mockCommentId, content: 'content', owner: realUserId,
       })));
-    mockThreadRepository.verifyThreadById = jest.fn()
+    mockThreadRepository.verifyThreadAvailabilityById = jest.fn()
       .mockImplementation(() => Promise.resolve('thread-123'));
     mockUserRepository.verifyUserById = jest.fn()
       .mockImplementation(() => Promise.resolve());
@@ -53,7 +53,7 @@ describe('DeleteCommentUseCase', () => {
       .mockImplementation(() => Promise.resolve(new Comment({
         id: mockCommentId, content: 'content', owner: realUserId,
       })));
-    mockThreadRepository.verifyThreadById = jest.fn()
+    mockThreadRepository.verifyThreadAvailabilityById = jest.fn()
       .mockImplementation(() => Promise.resolve('thread-123'));
     mockUserRepository.verifyUserById = jest.fn()
       .mockImplementation(() => { throw new Error(); });
@@ -83,7 +83,7 @@ describe('DeleteCommentUseCase', () => {
     /** mocking */
     mockCommentRepository.findCommentById = jest.fn()
       .mockImplementation(() => { throw new Error(); });
-    mockThreadRepository.verifyThreadById = jest.fn()
+    mockThreadRepository.verifyThreadAvailabilityById = jest.fn()
       .mockImplementation(() => Promise.resolve('thread-123'));
     mockUserRepository.verifyUserById = jest.fn()
       .mockImplementation(() => Promise.resolve());
@@ -114,7 +114,7 @@ describe('DeleteCommentUseCase', () => {
       })));
     mockCommentRepository.deleteCommentById = jest.fn()
       .mockImplementation(() => Promise.resolve());
-    mockThreadRepository.verifyThreadById = jest.fn()
+    mockThreadRepository.verifyThreadAvailabilityById = jest.fn()
       .mockImplementation(() => Promise.resolve('thread-123'));
     mockUserRepository.verifyUserById = jest.fn()
       .mockImplementation(() => Promise.resolve());
@@ -140,7 +140,7 @@ describe('DeleteCommentUseCase', () => {
     /** mocking */
     mockUserRepository.verifyUserById = jest.fn()
       .mockImplementation(() => Promise.resolve('user-123'));
-    mockThreadRepository.verifyThreadById = jest.fn()
+    mockThreadRepository.verifyThreadAvailabilityById = jest.fn()
       .mockImplementation(() => { throw new Error(); });
 
     const deleteCommentUseCase = new DeleteCommentUseCase({

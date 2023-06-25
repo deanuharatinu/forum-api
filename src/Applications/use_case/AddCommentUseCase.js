@@ -11,26 +11,10 @@ class AddCommentUseCase {
 
   async execute(useCasePayload, ownerId, threadId) {
     const addComment = new AddComment(useCasePayload);
-    await this._verifyUser(ownerId);
-    await this._verifyThread(threadId);
+    await this._userRepository.verifyUserById(ownerId);
+    await this._threadRepository.verifyThreadAvailabilityById(threadId);
     const comment = await this._commentRepository.addComment(addComment, threadId, ownerId);
     return comment;
-  }
-
-  async _verifyUser(ownerid) {
-    try {
-      await this._userRepository.verifyUserById(ownerid);
-    } catch (error) {
-      throw new Error('ADD_COMMENT_USE_CASE.USER_NOT_ALLOWED');
-    }
-  }
-
-  async _verifyThread(threadId) {
-    try {
-      await this._threadRepository.verifyThreadById(threadId);
-    } catch (error) {
-      throw new Error('ADD_COMMENT_USE_CASE.THREAD_NOT_FOUND');
-    }
   }
 }
 
