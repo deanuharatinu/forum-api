@@ -44,7 +44,7 @@ describe('GetThreadDetailUseCase', () => {
         date: 'a date',
         username: 'username-1',
       })));
-    mockCommentRepository.getCommenstByThreadId = jest.fn()
+    mockCommentRepository.getCommentsByThreadId = jest.fn()
       .mockImplementation(() => Promise.resolve([]));
     mockReplyRepository.getRepliesByCommentId = jest.fn()
       .mockImplementation(() => { throw new Error(); });
@@ -96,7 +96,7 @@ describe('GetThreadDetailUseCase', () => {
         replies: [],
       }),
     ];
-    mockCommentRepository.getCommenstByThreadId = jest.fn()
+    mockCommentRepository.getCommentsByThreadId = jest.fn()
       .mockImplementation(() => Promise.resolve(comments));
 
     /** create use case */
@@ -153,7 +153,7 @@ describe('GetThreadDetailUseCase', () => {
         replies: [],
       }),
     ];
-    mockCommentRepository.getCommenstByThreadId = jest.fn()
+    mockCommentRepository.getCommentsByThreadId = jest.fn()
       .mockImplementation(() => Promise.resolve(comments));
     mockReplyRepository.getRepliesByCommentId = jest.fn()
       .mockImplementation(() => Promise.resolve(replies));

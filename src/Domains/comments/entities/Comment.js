@@ -3,10 +3,12 @@ class Comment {
   constructor(payload) {
     this._verifyPayload(payload);
 
-    const { id, content, owner } = payload;
+    const {
+      id, content, owner, is_deleted: isDeleted,
+    } = payload;
 
     this.id = id;
-    this.content = content;
+    this.content = this._setDeletedComment(content, isDeleted);
     this.owner = owner;
   }
 
@@ -18,6 +20,14 @@ class Comment {
     if (typeof id !== 'string' || typeof content !== 'string' || typeof owner !== 'string') {
       throw new Error('COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
+  }
+
+  _setDeletedComment(content, isDeleted) {
+    if (isDeleted) {
+      return '**komentar telah dihapus**';
+    }
+
+    return content;
   }
 }
 

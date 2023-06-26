@@ -7,6 +7,7 @@ const pool = require('../../database/postgres/pool');
 const ReplyRepositoryPostgres = require('../ReplyRepositoryPostgres');
 const AddReply = require('../../../Domains/replies/entities/AddReply');
 const Reply = require('../../../Domains/replies/entities/Reply');
+const ReplyDetail = require('../../../Domains/replies/entities/ReplyDetail');
 
 describe('RepliesRepositoryPostgres', () => {
   afterEach(async () => {
@@ -106,6 +107,26 @@ describe('RepliesRepositoryPostgres', () => {
       expect(replyDetail2.id).toEqual(replyId2.id);
       expect(replyDetail2.content).toEqual('a reply 2');
       expect(replyDetail2.username).toEqual('test comment username');
+
+      const replyDetail1Date = await RepliesTableTestHelper.getReplyDatesById(replyId1.id);
+      const replyDetail2Date = await RepliesTableTestHelper.getReplyDatesById(replyId2.id);
+
+      expect(replyDetail).toStrictEqual([
+        new ReplyDetail({
+          id: replyId1.id,
+          content: 'a reply 1',
+          date: replyDetail1Date,
+          username: 'test comment username',
+          is_deleted: false,
+        }),
+        new ReplyDetail({
+          id: replyId2.id,
+          content: 'a reply 2',
+          date: replyDetail2Date,
+          username: 'test comment username',
+          is_deleted: false,
+        }),
+      ]);
     });
 
     it('should return a ReplyDetail object with obfuscated content when deleted', async () => {

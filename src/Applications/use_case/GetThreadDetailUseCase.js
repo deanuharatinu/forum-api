@@ -21,7 +21,7 @@ class GetThreadDetailUseCase {
     let commentsDetail = [];
     try {
       commentsDetail = await this._commentRepository
-        .getCommenstByThreadId(threadId);
+        .getCommentsByThreadId(threadId);
 
       commentsDetail = await this._getRepliesForComment(commentsDetail);
     } catch (error) {

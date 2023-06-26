@@ -42,4 +42,50 @@ describe('a Comment entities', () => {
       owner: '123',
     }));
   });
+
+  it('should show content when isDeleted == false', () => {
+    // Arrange
+    const payload = {
+      id: '123',
+      content: 'content',
+      owner: '123',
+      is_deleted: false,
+    };
+
+    // Action
+    const comment = new Comment(payload);
+
+    // Assert
+    expect(comment.id).toEqual(payload.id);
+    expect(comment.content).toEqual(payload.content);
+    expect(comment.owner).toEqual(payload.owner);
+    expect(comment).toStrictEqual(new Comment({
+      id: '123',
+      content: 'content',
+      owner: '123',
+    }));
+  });
+
+  it('should hide content when isDeleted == true', () => {
+    // Arrange
+    const payload = {
+      id: '123',
+      content: 'content',
+      owner: '123',
+      is_deleted: true,
+    };
+
+    // Action
+    const comment = new Comment(payload);
+
+    // Assert
+    expect(comment.id).toEqual(payload.id);
+    expect(comment.content).toEqual('**komentar telah dihapus**');
+    expect(comment.owner).toEqual(payload.owner);
+    expect(comment).toStrictEqual(new Comment({
+      id: '123',
+      content: '**komentar telah dihapus**',
+      owner: '123',
+    }));
+  });
 });

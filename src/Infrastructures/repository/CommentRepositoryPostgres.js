@@ -30,11 +30,7 @@ class CommentRepositoryPostgres extends CommentRepository {
       values: [true, commentId],
     };
 
-    const result = await this._pool.query(query);
-
-    if (!result.rowCount) {
-      throw new Error('comment tidak ditemukan');
-    }
+    await this._pool.query(query);
   }
 
   async findCommentById(commentId) {
@@ -49,15 +45,10 @@ class CommentRepositoryPostgres extends CommentRepository {
       throw new Error('comment tidak ditemukan');
     }
 
-    const { is_deleted: isDeleted } = result.rows[0];
-    if (isDeleted) {
-      throw new Error('comment tidak ditemukan');
-    }
-
     return new Comment(result.rows[0]);
   }
 
-  async getCommenstByThreadId(threadId) {
+  async getCommentsByThreadId(threadId) {
     const query = {
       text: `SELECT c.id, u.username, c.date, c.content, c.is_deleted 
             FROM comments AS c 
@@ -71,7 +62,7 @@ class CommentRepositoryPostgres extends CommentRepository {
     const result = await this._pool.query(query);
 
     if (!result.rowCount) {
-      throw new Error('comment tidak ditemukan');
+      return [];
     }
 
     return result.rows.map((payload) => new CommentDetail(payload));
@@ -86,11 +77,6 @@ class CommentRepositoryPostgres extends CommentRepository {
     const result = await this._pool.query(query);
 
     if (!result.rowCount) {
-      throw new NotFoundError('comment tidak ditemukan');
-    }
-
-    const { is_deleted: isDeleted } = result.rows[0];
-    if (isDeleted) {
       throw new NotFoundError('comment tidak ditemukan');
     }
 

@@ -97,6 +97,11 @@ describe('AddReplyUseCase', () => {
     expect(result.id).toEqual(mockReply.id);
     expect(result.content).toEqual(mockReply.content);
     expect(result.owner).toEqual(mockReply.owner);
+    expect(result).toStrictEqual(new Reply({
+      id: mockReply.id,
+      content: mockReply.content,
+      owner: mockReply.owner,
+    }));
 
     expect(mockThreadRepository.verifyThreadAvailabilityById).toBeCalledWith('thread-123');
     expect(mockCommentRepository.verifyCommentAvailabilityById).toBeCalledWith('comment-123');
