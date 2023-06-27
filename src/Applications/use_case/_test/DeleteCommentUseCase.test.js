@@ -9,6 +9,7 @@ describe('DeleteCommentUseCase', () => {
     // Arrange
     const mockCommentId = 'comment-123456';
     const mockUserId = 'usernotauthorized-12345';
+    const mockThreadId = 'thread-123';
     const realUserId = 'userathorized-12345';
 
     const mockCommentRepository = new CommentRepository();
@@ -33,9 +34,12 @@ describe('DeleteCommentUseCase', () => {
     });
 
     // Action and Assert
-    await expect(deleteCommentUseCase.execute(mockCommentId, mockUserId))
+    await expect(deleteCommentUseCase.execute(mockCommentId, mockThreadId, mockUserId))
       .rejects
       .toThrowError('DELETE_COMMENT_USE_CASE.USER_NOT_ALLOWED');
+    expect(mockUserRepository.verifyUserById).toBeCalledWith(mockUserId);
+    expect(mockThreadRepository.verifyThreadAvailabilityById).toBeCalledWith(mockThreadId);
+    expect(mockCommentRepository.findCommentById).toBeCalledWith(mockCommentId);
   });
 
   it('should throw error when user is not authenticated', async () => {
@@ -43,6 +47,7 @@ describe('DeleteCommentUseCase', () => {
     const mockCommentId = 'comment-123456';
     const mockUserId = 'usernotauthorized-12345';
     const realUserId = 'userathorized-12345';
+    const mockThreadId = 'thread-123';
 
     const mockCommentRepository = new CommentRepository();
     const mockThreadRepository = new ThreadRepository();
@@ -66,15 +71,19 @@ describe('DeleteCommentUseCase', () => {
     });
 
     // Action and Assert
-    await expect(deleteCommentUseCase.execute(mockCommentId, mockUserId))
+    await expect(deleteCommentUseCase.execute(mockCommentId, mockThreadId, mockUserId))
       .rejects
       .toThrowError('DELETE_COMMENT_USE_CASE.USER_NOT_AUTHENTICATED');
+    expect(mockUserRepository.verifyUserById).toBeCalledWith(mockUserId);
+    expect(mockThreadRepository.verifyThreadAvailabilityById).toBeCalledTimes(0);
+    expect(mockCommentRepository.findCommentById).toBeCalledTimes(0);
   });
 
   it('should throw error when comment is not found', async () => {
     // Arrange
     const mockCommentId = 'comment-123456';
     const mockUserId = 'usernotauthorized-12345';
+    const mockThreadId = 'thread-123';
 
     const mockCommentRepository = new CommentRepository();
     const mockThreadRepository = new ThreadRepository();
@@ -96,9 +105,12 @@ describe('DeleteCommentUseCase', () => {
     });
 
     // Action and Assert
-    await expect(deleteCommentUseCase.execute(mockCommentId, mockUserId))
+    await expect(deleteCommentUseCase.execute(mockCommentId, mockThreadId, mockUserId))
       .rejects
       .toThrowError('DELETE_COMMENT_USE_CASE.COMMENT_NOT_FOUND');
+    expect(mockCommentRepository.findCommentById).toBeCalledWith(mockCommentId);
+    expect(mockThreadRepository.verifyThreadAvailabilityById).toBeCalledWith(mockThreadId);
+    expect(mockUserRepository.verifyUserById).toBeCalledWith(mockUserId);
   });
 
   it('should not throw error when comment is found and deleted', async () => {
@@ -129,6 +141,10 @@ describe('DeleteCommentUseCase', () => {
     // Action and Assert
     await expect(deleteCommentUseCase.execute('comment-1234', 'thread-123', 'user-1234'))
       .resolves.not.toThrowError();
+    expect(mockUserRepository.verifyUserById).toBeCalledWith('user-1234');
+    expect(mockThreadRepository.verifyThreadAvailabilityById).toBeCalledWith('thread-123');
+    expect(mockCommentRepository.findCommentById).toBeCalledWith('comment-1234');
+    expect(mockCommentRepository.deleteCommentById).toBeCalledWith('comment-1234');
   });
 
   it('should throw error when thread is not found', async () => {
@@ -153,5 +169,7 @@ describe('DeleteCommentUseCase', () => {
     await expect(deleteCommentUseCase.execute())
       .rejects
       .toThrowError('DELETE_COMMENT_USE_CASE.THREAD_NOT_FOUND');
+    expect(mockUserRepository.verifyUserById).toBeCalledTimes(1);
+    expect(mockThreadRepository.verifyThreadAvailabilityById).toBeCalledTimes(1);
   });
 });
