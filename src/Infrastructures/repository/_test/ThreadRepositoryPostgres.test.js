@@ -97,7 +97,7 @@ describe('ThreadRepository postgres', () => {
     it('should return ThreadWithoutComments object correctly', async () => {
       // Arrange
       const newThread = new NewThread({ title: 'a title', body: 'a body' });
-      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      await UsersTableTestHelper.addUser({ id: 'user-123', username: 'john doe' });
 
       const fakeIdGenerator = () => '123';
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
@@ -109,6 +109,7 @@ describe('ThreadRepository postgres', () => {
       expect(threadDetailWithoutComments.id).toEqual(thread.id);
       expect(threadDetailWithoutComments.title).toEqual(newThread.title);
       expect(threadDetailWithoutComments.body).toEqual(newThread.body);
+      expect(threadDetailWithoutComments.username).toEqual('john doe');
     });
   });
 });

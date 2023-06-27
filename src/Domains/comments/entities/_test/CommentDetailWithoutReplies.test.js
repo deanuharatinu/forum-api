@@ -39,6 +39,7 @@ describe('a CommentDetailWithoutReplies entities', () => {
     expect(commentDetail.username).toEqual(payload.username);
     expect(commentDetail.date).toEqual(payload.date);
     expect(commentDetail.content).toEqual(payload.content);
+    expect(commentDetail.replies).toEqual([]);
   });
 
   it('should hide content if comment was deleted', () => {
@@ -59,6 +60,7 @@ describe('a CommentDetailWithoutReplies entities', () => {
     expect(commentDetail.username).toEqual(payload.username);
     expect(commentDetail.date).toEqual(payload.date);
     expect(commentDetail.content).toEqual('**komentar telah dihapus**');
+    expect(commentDetail.replies).toEqual([]);
   });
 
   it('should show content if comment not deleted', () => {
@@ -79,12 +81,14 @@ describe('a CommentDetailWithoutReplies entities', () => {
     expect(commentDetail.username).toEqual(payload.username);
     expect(commentDetail.date).toEqual(payload.date);
     expect(commentDetail.content).toEqual(payload.content);
+    expect(commentDetail.replies).toEqual([]);
     expect(commentDetail).toStrictEqual(new CommentDetailWithoutReplies({
       id: 'comment-123',
       username: 'john doe',
       date: '2021-08-08T07:22:33.555Z"',
       content: 'this is a comment',
       is_deleted: false,
+      replies: [],
     }));
   });
 });
