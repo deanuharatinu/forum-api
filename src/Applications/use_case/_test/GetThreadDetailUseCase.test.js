@@ -27,6 +27,7 @@ describe('GetThreadDetailUseCase', () => {
     await expect(getThreadDetailUseCase.execute('thread'))
       .rejects
       .toThrowError('GET_THREAD_DETAIL_USE_CASE.THREAD_NOT_FOUND');
+    expect(mockThreadRepository.getThreadDetailByThreadId).toBeCalledWith('thread');
   });
 
   it('should get correct object of ThreadDetailWithComments, with comment as an empty array', async () => {
@@ -46,8 +47,6 @@ describe('GetThreadDetailUseCase', () => {
       })));
     mockCommentRepository.getCommentsByThreadId = jest.fn()
       .mockImplementation(() => Promise.resolve([]));
-    mockReplyRepository.getRepliesByCommentId = jest.fn()
-      .mockImplementation(() => { throw new Error(); });
 
     /** create use case */
     const getCommentDetailUseCase = new GetCommentDetailUseCase({
@@ -60,7 +59,7 @@ describe('GetThreadDetailUseCase', () => {
     });
 
     // Action
-    const result = await getThreadDetailUseCase.execute('');
+    const result = await getThreadDetailUseCase.execute('thread-123');
 
     // Assert
     expect(result.id).toEqual('id');
@@ -69,6 +68,9 @@ describe('GetThreadDetailUseCase', () => {
     expect(result.date).toEqual('a date');
     expect(result.username).toEqual('username-1');
     expect(result.comments.length).toEqual(0);
+
+    expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith('thread-123');
+    expect(mockThreadRepository.getThreadDetailByThreadId).toBeCalledWith('thread-123');
   });
 
   it('should get correct object of ThreadDetailWithComments, with 0 replies', async () => {
@@ -106,7 +108,7 @@ describe('GetThreadDetailUseCase', () => {
     });
 
     // Action
-    const result = await getThreadDetailUseCase.execute('');
+    const result = await getThreadDetailUseCase.execute('thread-123');
 
     // Assert
     expect(result.id).toEqual('id');
@@ -115,6 +117,9 @@ describe('GetThreadDetailUseCase', () => {
     expect(result.date).toEqual('a date');
     expect(result.username).toEqual('username-1');
     expect(result.comments.length).toEqual(1);
+
+    expect(mockThreadRepository.getThreadDetailByThreadId).toBeCalledWith('thread-123');
+    expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith('thread-123');
   });
 
   it('should get correct object of ThreadDetailWithComments, with 1 replies', async () => {
@@ -170,7 +175,7 @@ describe('GetThreadDetailUseCase', () => {
     });
 
     // Action
-    const result = await getThreadDetailUseCase.execute('');
+    const result = await getThreadDetailUseCase.execute('thread-123');
 
     // Assert
     expect(result.id).toEqual('id');
@@ -183,5 +188,9 @@ describe('GetThreadDetailUseCase', () => {
     expect(result.comments.length).toEqual(1);
     const reply = result.comments[0].replies[0];
     expect(reply.id).toEqual('reply-123');
+
+    expect(mockThreadRepository.getThreadDetailByThreadId).toBeCalledWith('thread-123');
+    expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith('thread-123');
+    expect(mockReplyRepository.getRepliesByCommentId).toBeCalledWith(comments[0].id);
   });
 });

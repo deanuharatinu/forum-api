@@ -15,9 +15,10 @@ describe('GetCommentDetailUseCase', () => {
     });
 
     // Action and Assert
-    await expect(getCommentDetailUseCase.execute(''))
+    await expect(getCommentDetailUseCase.execute('reply-123'))
       .rejects
       .toThrowError('GET_THREAD_DETAIL_USE_CASE.THREAD_NOT_FOUND');
+    expect(mockReplyRepository.getRepliesByCommentId).toBeCalledWith('reply-123');
   });
 
   it('should return correct reply object', async () => {
@@ -42,7 +43,7 @@ describe('GetCommentDetailUseCase', () => {
     });
 
     // Action
-    const result = await getCommentDetailUseCase.execute('');
+    const result = await getCommentDetailUseCase.execute('reply-123');
 
     // Assert
     expect(result.length).toEqual(1);
@@ -51,5 +52,6 @@ describe('GetCommentDetailUseCase', () => {
     expect(reply.content).toEqual('a content');
     expect(reply.date).toEqual('date');
     expect(reply.username).toEqual('username');
+    expect(mockReplyRepository.getRepliesByCommentId).toBeCalledWith('reply-123');
   });
 });

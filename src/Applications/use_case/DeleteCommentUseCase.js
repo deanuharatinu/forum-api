@@ -6,19 +6,13 @@ class DeleteCommentUseCase {
   }
 
   async execute(commentId, threadId, userId) {
-    await this._verifyComment(commentId, threadId, userId);
+    await this._verifyUser(userId);
+    await this._threadRepository.verifyThreadAvailabilityById(threadId);
+    await this._verifyComment(commentId, userId);
     await this._commentRepository.deleteCommentById(commentId);
   }
 
-  async _verifyComment(commentId, threadId, userId) {
-    await this._verifyUser(userId);
-
-    try {
-      await this._threadRepository.verifyThreadAvailabilityById(threadId);
-    } catch (error) {
-      throw new Error('DELETE_COMMENT_USE_CASE.THREAD_NOT_FOUND');
-    }
-
+  async _verifyComment(commentId, userId) {
     let comment;
     try {
       comment = await this._commentRepository.findCommentById(commentId);

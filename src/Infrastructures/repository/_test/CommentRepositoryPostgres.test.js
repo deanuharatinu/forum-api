@@ -7,6 +7,7 @@ const AddComment = require('../../../Domains/comments/entities/AddComment');
 const Comment = require('../../../Domains/comments/entities/Comment');
 const pool = require('../../database/postgres/pool');
 const CommentRepositoryPostgres = require('../CommentRepositoryPostgres');
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 
 describe('CommentRepository postgres', () => {
   beforeEach(async () => {
@@ -140,6 +141,19 @@ describe('CommentRepository postgres', () => {
         content: 'a content',
         owner: 'user-123',
       }));
+    });
+
+    it('should throw error when comment is not found', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      await ThreadsTableTestHelper.addNewThread({ owner: 'user-123' });
+      const fakeIdGenerator = () => '123';
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
+
+      // Assert and Action
+      await expect(commentRepositoryPostgres.findCommentById('comment-123'))
+        .rejects
+        .toThrowError(new NotFoundError('comment tidak ditemukan'));
     });
   });
 

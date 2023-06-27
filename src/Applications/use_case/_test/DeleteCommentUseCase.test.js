@@ -3,6 +3,7 @@ const CommentRepository = require('../../../Domains/comments/CommentRepository')
 const Comment = require('../../../Domains/comments/entities/Comment');
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const UserRepository = require('../../../Domains/users/UserRepository');
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 
 describe('DeleteCommentUseCase', () => {
   it('should throw error when user is not authorized', async () => {
@@ -157,7 +158,7 @@ describe('DeleteCommentUseCase', () => {
     mockUserRepository.verifyUserById = jest.fn()
       .mockImplementation(() => Promise.resolve('user-123'));
     mockThreadRepository.verifyThreadAvailabilityById = jest.fn()
-      .mockImplementation(() => { throw new Error(); });
+      .mockImplementation(() => { throw new NotFoundError(); });
 
     const deleteCommentUseCase = new DeleteCommentUseCase({
       commentRepository: mockCommentRepository,
@@ -168,7 +169,7 @@ describe('DeleteCommentUseCase', () => {
     // Action and Assert
     await expect(deleteCommentUseCase.execute())
       .rejects
-      .toThrowError('DELETE_COMMENT_USE_CASE.THREAD_NOT_FOUND');
+      .toThrowError(NotFoundError);
     expect(mockUserRepository.verifyUserById).toBeCalledTimes(1);
     expect(mockThreadRepository.verifyThreadAvailabilityById).toBeCalledTimes(1);
   });

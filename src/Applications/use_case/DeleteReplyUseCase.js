@@ -9,25 +9,14 @@ class DeleteReplyUseCase {
   }
 
   async execute(replyId, commentId, threadId, userId) {
-    await this._verifyReply(replyId, commentId, threadId, userId);
+    await this._verifyUser(userId);
+    await this._threadRepository.verifyThreadAvailabilityById(threadId);
+    await this._commentRepository.findCommentById(commentId);
+    await this._verifyReply(replyId, userId);
     await this._replyRepository.deleteReplyById(replyId);
   }
 
-  async _verifyReply(replyId, commentId, threadId, userId) {
-    await this._verifyUser(userId);
-
-    try {
-      await this._threadRepository.verifyThreadAvailabilityById(threadId);
-    } catch (error) {
-      throw new Error('DELETE_REPLY_USE_CASE.THREAD_NOT_FOUND');
-    }
-
-    try {
-      await this._commentRepository.findCommentById(commentId);
-    } catch (error) {
-      throw new Error('DELETE_REPLY_USE_CASE.COMMENT_NOT_FOUND');
-    }
-
+  async _verifyReply(replyId, userId) {
     let reply;
     try {
       reply = await this._replyRepository.findReplyById(replyId);

@@ -6,7 +6,7 @@ const Reply = require('../../../Domains/replies/entities/Reply');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 
 describe('AddReplyUseCase', () => {
-  it('should throw error when reply not found', async () => {
+  it('should throw error when thread not found', async () => {
     // Arrange
     const mockThreadRepository = new ThreadRepository();
     const mockCommentRepository = new CommentRepository();
@@ -27,9 +27,10 @@ describe('AddReplyUseCase', () => {
     };
 
     // Action
-    await expect(addReplyUseCase.execute(useCasePayload, '', '', ''))
+    await expect(addReplyUseCase.execute(useCasePayload, 'thread-123', '', ''))
       .rejects
       .toThrowError('thread tidak ditemukan');
+    expect(mockThreadRepository.verifyThreadAvailabilityById).toBeCalledWith('thread-123');
   });
 
   it('should throw error when comment not found', async () => {
@@ -55,9 +56,11 @@ describe('AddReplyUseCase', () => {
     };
 
     // Action
-    await expect(addReplyUseCase.execute(useCasePayload, '', ''))
+    await expect(addReplyUseCase.execute(useCasePayload, 'thread-123', 'comment-123', ''))
       .rejects
       .toThrowError('comment tidak ditemukan');
+    expect(mockThreadRepository.verifyThreadAvailabilityById).toBeCalledWith('thread-123');
+    expect(mockCommentRepository.verifyCommentAvailabilityById).toBeCalledWith('comment-123');
   });
 
   it('should orchestrating the add reply action correctly', async () => {

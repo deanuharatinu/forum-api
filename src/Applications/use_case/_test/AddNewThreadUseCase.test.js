@@ -74,5 +74,6 @@ describe('AddNewThreadUseCase', () => {
     await expect(addNewThreadUseCase.execute(useCasePayload, 'user-123'))
       .rejects
       .toThrowError('user tidak dikenal');
+    expect(mockUserRepository.verifyUserById).toBeCalledWith('user-123');
   });
 });
