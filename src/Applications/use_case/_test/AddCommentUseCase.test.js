@@ -84,6 +84,7 @@ describe('AddCommentUseCase', () => {
     await expect(addCommentUseCase.execute(useCasePayload, 'user-123', 'thread-123'))
       .rejects
       .toThrowError('user tidak dikenal');
+    await expect(mockUserRepository.verifyUserById).toBeCalledWith('user-123');
   });
 
   it('should throw error when thread is not found', async () => {
@@ -110,5 +111,7 @@ describe('AddCommentUseCase', () => {
     await expect(addCommentUseCase.execute(useCasePayload, 'user-123', 'thread-123'))
       .rejects
       .toThrowError('thread tidak ditemukan');
+    expect(mockUserRepository.verifyUserById).toBeCalledWith('user-123');
+    expect(mockThreadRepository.verifyThreadAvailabilityById).toBeCalledTimes(1);
   });
 });
