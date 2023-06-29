@@ -6,7 +6,9 @@ describe('LikeCommentUseCase', () => {
   it('should throw error when thread is not found', async () => {
     // Arrange
     const mockThreadRepository = new ThreadRepository();
-    mockThreadRepository.verifyThreadAvailabilityById = jest.fn(() => Promise.resolve());
+    mockThreadRepository.verifyThreadAvailabilityById = jest.fn(() => {
+      throw new NotFoundError();
+    });
 
     const likeCommentUseCase = new LikeCommentUseCase({ threadRepository: mockThreadRepository });
 
