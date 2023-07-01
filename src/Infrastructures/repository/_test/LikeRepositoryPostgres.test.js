@@ -103,4 +103,32 @@ describe('LikeRepositoryPostgres', () => {
       expect(result).toEqual(likeId);
     });
   });
+
+  describe('getLikesCountByCommentId function', () => {
+    it('should return 0 when there is no likes found', async () => {
+      // Arrange
+      const likeRepositoryPostgres = new LikeRepositoryPostgres(pool, {});
+
+      // Action
+      const result = await likeRepositoryPostgres.getLikesCountByCommentId(COMMENT_ID);
+
+      // Assert
+      expect(result).toBe(0);
+    });
+
+    it('should return correct count when likes is found', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({ id: 'new-user-123', username: 'john' });
+      await LikesTableTestHelper.addLikeComment('like-1', COMMENT_ID, USER_ID);
+      await LikesTableTestHelper.addLikeComment('like-2', COMMENT_ID, 'new-user-123');
+
+      const likeRepositoryPostgres = new LikeRepositoryPostgres(pool, {});
+
+      // Action
+      const result = await likeRepositoryPostgres.getLikesCountByCommentId(COMMENT_ID);
+
+      // Assert
+      expect(result).toBe(2);
+    });
+  });
 });
