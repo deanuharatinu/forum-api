@@ -25,6 +25,17 @@ const LikesTableTestHelper = {
 
     return result.rows[0];
   },
+
+  async getLikesCountByCommentId(commentId) {
+    const query = {
+      text: 'SELECT COUNT(*) FROM likes WHERE comment_id = $1',
+      values: [commentId],
+    };
+
+    const result = await pool.query(query);
+
+    return parseInt(result.rows[0].count, 10);
+  },
 };
 
 module.exports = LikesTableTestHelper;

@@ -6,6 +6,7 @@ const CommentDetail = require('../../../Domains/comments/entities/CommentDetailW
 const ReplyDetail = require('../../../Domains/replies/entities/ReplyDetail');
 const GetCommentDetailUseCase = require('../GetCommentDetailUseCase');
 const ReplyRepository = require('../../../Domains/replies/ReplyRepository');
+const LikeRepository = require('../../../Domains/likes/LikeRepository');
 
 describe('GetThreadDetailUseCase', () => {
   it('should throw error when thread is not found', async () => {
@@ -127,6 +128,7 @@ describe('GetThreadDetailUseCase', () => {
     const mockCommentRepository = new CommentRepository();
     const mockThreadRepository = new ThreadRepository();
     const mockReplyRepository = new ReplyRepository();
+    const mockLikeRepository = new LikeRepository();
 
     /** mocking */
     mockThreadRepository.getThreadDetailByThreadId = jest.fn()
@@ -162,6 +164,7 @@ describe('GetThreadDetailUseCase', () => {
       .mockImplementation(() => Promise.resolve(comments));
     mockReplyRepository.getRepliesByCommentId = jest.fn()
       .mockImplementation(() => Promise.resolve(replies));
+    mockLikeRepository.getLikesCountByCommentId = jest.fn(() => Promise.resolve(replies.length));
 
     const getCommentDetailUseCase = new GetCommentDetailUseCase({
       replyRepository: mockReplyRepository,
@@ -172,6 +175,7 @@ describe('GetThreadDetailUseCase', () => {
       threadRepository: mockThreadRepository,
       commentRepository: mockCommentRepository,
       getCommentDetailUseCase,
+      likeRepository: mockLikeRepository,
     });
 
     // Action
@@ -192,5 +196,6 @@ describe('GetThreadDetailUseCase', () => {
     expect(mockThreadRepository.getThreadDetailByThreadId).toBeCalledWith('thread-123');
     expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith('thread-123');
     expect(mockReplyRepository.getRepliesByCommentId).toBeCalledWith(comments[0].id);
+    expect(mockLikeRepository.getLikesCountByCommentId).toBeCalledWith(comments[0].id);
   });
 });

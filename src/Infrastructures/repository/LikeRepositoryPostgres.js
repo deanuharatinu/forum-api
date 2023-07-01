@@ -21,10 +21,10 @@ class LikeRepositoryPostgres extends LikeRepository {
     return result.rows[0].id;
   }
 
-  async deleteLikeComment(likeId) {
+  async deleteLikeComment(commentId, userId) {
     const query = {
-      text: 'DELETE FROM likes WHERE id = $1',
-      values: [likeId],
+      text: 'DELETE FROM likes WHERE comment_id = $1 AND user_id = $2',
+      values: [commentId, userId],
     };
 
     await this._pool.query(query);
@@ -52,10 +52,6 @@ class LikeRepositoryPostgres extends LikeRepository {
     };
 
     const result = await this._pool.query(query);
-
-    if (!result.rowCount) {
-      return 0;
-    }
 
     return parseInt(result.rows[0].count, 10);
   }

@@ -72,7 +72,7 @@ describe('LikeRepositoryPostgres', () => {
       // Action
       const beforeDeleteResult = await LikesTableTestHelper.findLikeCommentById(likeId);
       expect(beforeDeleteResult).not.toBe(undefined);
-      await likeRepositoryPostgres.deleteLikeComment(likeId);
+      await likeRepositoryPostgres.deleteLikeComment(COMMENT_ID, USER_ID);
 
       // Assert
       const persistedResult = await LikesTableTestHelper.findLikeCommentById(likeId);
@@ -110,7 +110,7 @@ describe('LikeRepositoryPostgres', () => {
       const likeRepositoryPostgres = new LikeRepositoryPostgres(pool, {});
 
       // Action
-      const result = await likeRepositoryPostgres.getLikesCountByCommentId(COMMENT_ID);
+      const result = await likeRepositoryPostgres.getLikesCountByCommentId('');
 
       // Assert
       expect(result).toBe(0);
