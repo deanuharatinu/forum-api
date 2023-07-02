@@ -4,7 +4,7 @@ class CommentDetailWithoutReplies {
     this._verifyPayload(payload);
 
     const {
-      id, username, date, content, is_deleted: isDeleted, replies = [],
+      id, username, date, content, is_deleted: isDeleted, replies = [], likeCount = 0,
     } = payload;
 
     this.id = id;
@@ -12,6 +12,7 @@ class CommentDetailWithoutReplies {
     this.date = date;
     this.content = this._setDeletedComment(content, isDeleted);
     this.replies = replies;
+    this.likeCount = likeCount;
   }
 
   _verifyPayload({

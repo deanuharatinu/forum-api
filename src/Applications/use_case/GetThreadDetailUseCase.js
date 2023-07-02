@@ -3,10 +3,13 @@ const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 const CommentDetailWithoutReplies = require('../../Domains/comments/entities/CommentDetailWithoutReplies');
 
 class GetThreadDetailUseCase {
-  constructor({ threadRepository, commentRepository, getCommentDetailUseCase }) {
+  constructor({
+    threadRepository, commentRepository, getCommentDetailUseCase, likeRepository,
+  }) {
     this._threadRepository = threadRepository;
     this._commentRepository = commentRepository;
     this._getCommentDetailUseCase = getCommentDetailUseCase;
+    this._likeRepository = likeRepository;
   }
 
   async execute(threadId) {
@@ -39,6 +42,7 @@ class GetThreadDetailUseCase {
   async _getRepliesForComment(comments) {
     const promises = comments.map(async (comment) => {
       const { id: commentId } = comment;
+      const likeCount = await this._likeRepository.getLikesCountByCommentId(commentId);
       try {
         const replies = await this._getCommentDetailUseCase.execute(commentId);
         return new CommentDetailWithoutReplies({
@@ -47,10 +51,18 @@ class GetThreadDetailUseCase {
           date: comment.date,
           content: comment.content,
           isDeleted: comment.isDeleted,
+          likeCount,
           replies,
         });
       } catch (error) {
-        return comment;
+        return new CommentDetailWithoutReplies({
+          id: comment.id,
+          username: comment.username,
+          date: comment.date,
+          content: comment.content,
+          isDeleted: comment.isDeleted,
+          likeCount,
+        });
       }
     });
 
